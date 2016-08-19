@@ -53,51 +53,39 @@ dd.config({
 						'device.notification.showPreloader','device.notification.hidePreloader','biz.navigation.close' ]
 });
 dd.ready(function(){
-	//获得授权登陆code
-	dd.runtime.permission.requestAuthCode({
-	    corpId: authconfig.corpId,
-	    onSuccess: function(result) {
-	    /*{
-	        code: 'hYLK98jkf0m' //string authCode
-	    }*/
+
+	    
 	    $.ajax({
 	    	  type: 'POST',
 	    	  url: '${ctx}/plan/authuser',
-	    	  // data to be added to query string:
-	    	  data: { code: result.code },
-	    	  // type of data we are expecting in return:
+	    	  data: { },
 	    	  dataType: 'json',
 	    	  success: function(data){
-	    	    // Supposing this JSON payload was received:
-	    	    //   {"project": {"id": 42, "html": "<div>..." }}
-	    	    // append the HTML to context object.
 	    	    var listdept="";
-	    	     $.each(data.userdata,function(i,n){
-		               if(n.parentid==="true"){
-		            	   listdept=listdept+"<a href=\"${ctx}/plan/planlist?dd_nav_bgcolor=FF30A8A5&deptid="+n.id+"&deptname="+encodeURI(n.name)+"\" class=\"weui_media_box weui_media_text\"><p class=\"weui_media_desc\">"+n.name+" <span class=\"zhuguan\">主管</span></p></a> ";  		    	    	    
-		                }else{
-		                	listdept=listdept+"<a href=\"${ctx}/plan/tasklist?dd_nav_bgcolor=FF30A8A5&deptid="+n.id+"\" class=\"weui_media_box weui_media_text\"><p class=\"weui_media_desc\">"+n.name+"</p></a> ";  		    	    	    			                
-		                }
-	    	     });
+	    	   // alert(data.userdata.length);
+	    	  
+		    	    $.each(data.userdata,function(i,n){
+			            	   listdept=listdept+"<a href=\"${ctx}/plan/planlist?dd_nav_bgcolor=FF30A8A5&deptid="+n.id+"&deptname="+encodeURI(n.name)+"\" class=\"weui_media_box weui_media_text\"><p class=\"weui_media_desc\">"+n.name+" <span class=\"zhuguan\">主管</span></p></a> ";  		    	    	    
+			                
+		    	     });
 		            document.getElementById("deptlistdiv").innerHTML=listdept;
-		           
+	    	     
 	    	  },
 	    	  error: function(xhr, type,error){
-	    	    alert('Ajax error!')
+	    	    alert('Ajax error!');
 	    	  }
-	    	})
+	    	});
 	    
 	    
 	    
-	    },
-	    onFail : function(err) {}
-
-	})
+	  
 });
 dd.error(function(err) {
 	alert('sdfs');
 	alert('dd error: ' + JSON.stringify(err));
 });
+
+
 
 </script>
 <div class="weui_panel">

@@ -38,6 +38,41 @@ public class plan  {
 	private String weight;//权重
 	private String ssessmentindex;//考核指标
 	
+	//任务信息
+	private String pid;
+	private String planid;
+	private String stime;
+	private String endtime;
+	private String fuzherenname;
+	private String fuzherenid;
+	private String ziyuanpeizhi;
+	private String jindu;
+	
+	public String getFuzherenname() {
+		return fuzherenname;
+	}
+	public void setFuzherenname(String fuzherenname) {
+		this.fuzherenname = fuzherenname;
+	}
+	public String getFuzherenid() {
+		return fuzherenid;
+	}
+	public void setFuzherenid(String fuzherenid) {
+		this.fuzherenid = fuzherenid;
+	}
+	public String getZiyuanpeizhi() {
+		return ziyuanpeizhi;
+	}
+	public void setZiyuanpeizhi(String ziyuanpeizhi) {
+		this.ziyuanpeizhi = ziyuanpeizhi;
+	}
+	public String getJindu() {
+		return jindu;
+	}
+	public void setJindu(String jindu) {
+		this.jindu = jindu;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -110,6 +145,30 @@ public class plan  {
 	}
 	public void setDeptid(String deptid) {
 		this.deptid = deptid;
+	}
+	public String getPid() {
+		return pid;
+	}
+	public void setPid(String pid) {
+		this.pid = pid;
+	}
+	public String getStime() {
+		return stime;
+	}
+	public void setStime(String stime) {
+		this.stime = stime;
+	}
+	public String getEndtime() {
+		return endtime;
+	}
+	public void setEndtime(String endtime) {
+		this.endtime = endtime;
+	}
+	public String getPlanid() {
+		return planid;
+	}
+	public void setPlanid(String planid) {
+		this.planid = planid;
 	}
 	
 	

@@ -31,6 +31,9 @@ public interface PlanDao<T, ID extends Serializable> extends JpaRepository<plan,
    //List<Events> findByStarttimeGreaterThanAndStarttimeLessThanAndOperationerid(Date sDate,Date eDate,String userid);
    //List<Events> findByStarttimeGreaterThanAndStarttimeLessThanAndParticipantidLikeAndOperationeridNot(Date sDate,Date eDate,String userid,String adduserid);
 	List<plan> findByDeptidAndYear(String deptid, String year);
+	List<plan> findByDeptidAndYearAndPid(String deptid, String year,String pid);
+	List<plan> findByPid(String pid);
+	List<plan> findByFuzherenidLikeAndDeptidInAndJinduNotOrderByStimeAsc(String fuzherenid,List<String> deptid,String jindu);
    //findBy("StarttimeGreaterThanAndStarttimeLessThanAndOperationerid",sDate ,eDate,userid);
 	//List<Events> ceventslist=eventsService.findBy("StarttimeGreaterThanAndStarttimeLessThanAndParticipantidLike", sDate, eDate,userid);
 }

@@ -13,6 +13,7 @@
     <title></title>
   
     <link href="${ctx}/static/dingding/weui.min.css" rel="stylesheet" />
+    <link href="${ctx}/static/plancss/lookview.css" rel="stylesheet" />
     <script src="${ctx}/static/dingding/zepto.min.js"></script>
     <!-- 钉钉js -->
  <script src='${ctx}/static/dingding/dingtalk.js'></script>
@@ -39,21 +40,14 @@
 </head>
 <body>
 <script type="text/javascript">
+var authconfig=$.parseJSON('${authconfig}');
+</script>
+<script src="${ctx}/static/planjs/dingpublic.js"></script>
+<script type="text/javascript">
 var deptid="${deptid}";
 var deptname="${deptname}";
-var authconfig=$.parseJSON('${authconfig}');
-dd.config({
-		agentId : authconfig.agentid,
-		corpId : authconfig.corpId,
-		timeStamp : authconfig.timeStamp,
-		nonceStr : authconfig.nonceStr,
-		signature : authconfig.signature,
-		jsApiList : [ 'runtime.info', 'biz.contact.choose',
-						'device.notification.confirm', 'device.notification.alert',
-						'device.notification.prompt', 'biz.ding.post',
-						'biz.util.openLink','biz.navigation.setRight','biz.navigation.setLeft',
-						'device.notification.showPreloader','device.notification.hidePreloader','biz.navigation.close' ]
-});
+
+
 dd.ready(function(){
 	//指定默认年份
 	$("#selectyear").val("${year}");
@@ -68,35 +62,8 @@ dd.ready(function(){
             log.e(JSON.stringify(err));
         }
     });
-	//设置右侧按钮
-	dd.biz.navigation.setMenu({
-        backgroundColor : "#ADD8E6",
-        items : [ {"id":"1",//字符串
-            "iconId":"add",//字符串，图标命名
-              "text":"添加"}],
-        onSuccess: function(data) {
-        	window.location.href="${ctx}/plan/planadd?dd_nav_bgcolor=FF30A8A5&deptid="+deptid+"&year="+$("#selectyear").val();
-            
-        },
-        onFail: function(err) {
-        }
-    });
-	
-	//设置左侧按钮
-	dd.biz.navigation.setLeft({
-	    show: true,//控制按钮显示， true 显示， false 隐藏， 默认true
-	    control: true,//是否控制点击事件，true 控制，false 不控制， 默认false
-	    showIcon: true,//是否显示icon，true 显示， false 不显示，默认true； 注：具体UI以客户端为准
-	    text: '钉钉',//控制显示文本，空字符串表示显示默认文本
-	    onSuccess : function(result) {
-	    	dd.biz.navigation.close({
-			    onSuccess : function(result) {},
-			    onFail : function(err) {}}
-	    	);
-	    },
-	    onFail : function(err) {}
-	});
-	//
+
+	initpage();
 	    
 });
 dd.error(function(err) {
@@ -117,7 +84,7 @@ function getplanlist(){
   	  success: function(data){
   	    var listdept="";
   	     $.each(data.userdata,function(i,n){
-  	    	 listdept+="<a href=\"${ctx}/plan/planadd?id="+n.id+"\" class=\"weui_media_box weui_media_text\">";
+  	    	 listdept+="<a href=\"${ctx}/plan/planedit?id="+n.id+"&power=${power}\" class=\"weui_media_box weui_media_text\">";
   	    	 listdept+="<p class=\"weui_media_desc\">"+n.title+"</p>";
   	    	 listdept+="<ul class=\"weui_media_info\">";
   	    	 listdept+="<li class=\"weui_media_info_meta\">创建人:"+n.operationer+"</li>";
@@ -137,24 +104,86 @@ function getplanlist(){
 </script>
 <div class="weui_panel">
     <div class="weui_panel_hd">
-     <select  name="selectyear" id="selectyear">
+     <select  name="selectyear" id="selectyear" onchange="getplanlist();initpage()">
             <option value="2015" >2015年</option>
             <option value="2016">2016年</option>
             <option value="2017">2017年</option>
      </select>计划列表
     </div>
     <div class="weui_panel_bd" id="planlistdiv">
-       <a href="planinfo.html" class="weui_media_box weui_media_text">
-
-            <p class="weui_media_desc">公司计划工作处理</p>
-            <ul class="weui_media_info">
-                <li class="weui_media_info_meta">创建人：部门经理</li>
-                <li class="weui_media_info_meta">公司计划</li>
-                <li class="weui_media_info_meta weui_media_info_meta_extra">计划权重：30%</li>
-            </ul>
-        </a>
+      
 
     </div>
 </div>
+<div class="approve-foot show">
+<div class="tFlexbox tAlignCenter tJustifyCenter" id="btnlist">
+
+</div>
+</div>
 </body>
+<script>
+function addplan(){
+	window.location.href="${ctx}/plan/planadd?dd_nav_bgcolor=FF30A8A5&deptid="+deptid+"&year="+$("#selectyear").val();
+	
+}
+function opencheck(){
+	window.location.href="${ctx}/check/shenpiadd?dd_nav_bgcolor=FF30A8A5&checkid=${checkid}";
+	
+}
+function initpage(){
+	if("${power}"=="look"){return;}
+	if("${power}"=="shenpi"){
+		btnlist="<div class=\"tFlex1 approval-action tTap agree\"  onclick=\"opencheck()\" >审核</div>";
+	    
+	  document.getElementById("btnlist").innerHTML=btnlist;	
+	  return;
+	}
+	$.ajax({
+	  	  type: 'POST',
+	  	  url: '${ctx}/check/getstate',
+	  	  data: { deptid: deptid,
+	  		  	year:$("#selectyear").val()	
+	  	  		},
+	  	  dataType: 'json',
+	  	  success: function(data){
+	  	    var state=data.userdata;
+	  	    var btnlist="";
+	  	    if(state=="1"){
+	  	    	btnlist="<div class=\"tFlex1 approval-action tTap agree\" onclick=\"addplan()\" >添加计划</div>";
+	  	    	btnlist+="<div class=\"tFlex1 approval-action tTap agree\"  onclick=\"submitplan()\" >提交计划</div>";
+	  	    	
+	  	    }else{
+	  	    	btnlist="<div class=\"tFlex1 approval-action tTap agree\"  onclick=\"lookcheck("+data.message+")\" >查看审核记录</div>";
+	  	    }
+	  	  document.getElementById("btnlist").innerHTML=btnlist;	
+		           
+	  	  },
+	  	  error: function(xhr, type,error){
+	  	    alert('Ajax error!');
+	  	  }
+	  	});
+}
+function submitplan(){
+	$.ajax({
+	  	  type: 'POST',
+	  	  url: '${ctx}/check/subplan',
+	  	  data: { deptid: deptid,
+	  		  	year:$("#selectyear").val(),
+	  		  	deptname:deptname,
+	  	  		},
+	  	  dataType: 'json',
+	  	  success: function(data){
+	  		successalert(data.userdata);
+	  		initpage();
+	  	  },
+	  	  error: function(xhr, type,error){
+	  	    alert('Ajax error!');
+	  	  }
+	  	});
+}
+function lookcheck(checkid){
+	window.location.href="${ctx}/check/shenheview?dd_nav_bgcolor=FF30A8A5&checkid="+checkid;
+	
+}
+</script>               
 </html>

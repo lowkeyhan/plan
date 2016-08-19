@@ -137,7 +137,6 @@ public class HttpHelper {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(2000).setConnectTimeout(2000).build();
         httpPost.setConfig(requestConfig);
-
         HttpEntity requestEntity = MultipartEntityBuilder.create().addPart("media",
         		new FileBody(file, ContentType.APPLICATION_OCTET_STREAM, file.getName())).build();
         httpPost.setEntity(requestEntity);

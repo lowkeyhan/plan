@@ -57,7 +57,8 @@ public class planContorller {
 		//model.addAttribute("code", code);
 		String configstr= AuthHelper.getConfig(request);
 		model.addAttribute("authconfig", configstr);
-		return "plan/plandeptlist";
+	//	return "plan/plandeptlist";
+		return "plan/index";
 	}
 	
 	
@@ -71,16 +72,67 @@ public class planContorller {
 	 */
 	@RequestMapping("/planlist")
 	public String planlist(@RequestParam(value="deptid",required=false)String deptid,
-			@RequestParam(value="deptname",required=false)String deptname,Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+			HttpServletResponse response,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
 		//model.addAttribute("code", code);
 		String configstr= AuthHelper.getConfig(request);
 		model.addAttribute("authconfig", configstr);
-		model.addAttribute("deptid", deptid);
-		model.addAttribute("deptname",new String(deptname.getBytes("ISO-8859-1"), "UTF-8"));
+		List<Department> mydepDepartments=planService.getdept(request, response);
 		Calendar nowCalendar=Calendar.getInstance();
 		model.addAttribute("year", nowCalendar.get(Calendar.YEAR));
+		if(StringUtil.isNotBlank(deptid)){
+			for (Department department : mydepDepartments) {
+				if(deptid.equals(department.id)){
+					model.addAttribute("deptid",department.id );
+					model.addAttribute("deptname",department.name);
+					model.addAttribute("power",department.parentid);
+				}
+			}
+			return "plan/planlist";
+		}else if (mydepDepartments.size()==1){
+			Department mydep=mydepDepartments.get(0);
+		model.addAttribute("deptid",mydep.id );
+		model.addAttribute("deptname",mydep.name);
+		model.addAttribute("power",mydep.parentid);
+		
+		
+		return "plan/planlist";
+		}else {
+			return "plan/plandeptlist";
+		}
+	}
+	
+	@RequestMapping("/planview")
+	public String planlist(@RequestParam(value="deptid",required=false)String deptid,
+			@RequestParam(value="year",required=false)String year,
+			@RequestParam(value="power",required=false)String power,
+			@RequestParam(value="checkid",required=false)String checkid,HttpServletResponse response,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		//model.addAttribute("code", code);
+		List<Department> dlist=DepartmentHelper.listDepartments(AuthHelper.getAccessToken());
+		for (Department dep : dlist) {
+			if(dep.id==deptid){
+				model.addAttribute("deptname",dep.name);
+			}
+		}
+		String configstr= AuthHelper.getConfig(request);
+		model.addAttribute("authconfig", configstr);
+		model.addAttribute("deptid",deptid );
+		model.addAttribute("power",power);
+		model.addAttribute("checkid",checkid);
+		Calendar nowCalendar=Calendar.getInstance();
+		if(StringUtil.isBlank(year)){
+			model.addAttribute("year", nowCalendar.get(Calendar.YEAR));
+		}else{
+			model.addAttribute("year",year);
+		}
+		
+		
 		return "plan/planlist";
 	}
+	
+	
+	
 	/** 跳转添加计划
 	 * @param deptid 部门id
 	 * @param year  年份
@@ -111,10 +163,14 @@ public class planContorller {
 	 * @throws UnsupportedEncodingException
 	 */
 	@RequestMapping("/planedit")
-	public String planadd(@RequestParam(value="id",required=false)String id,
+	public String planadd2(@RequestParam(value="id",required=false)String id,
+			@RequestParam(value="power",required=false)String power,
 			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
 		//model.addAttribute("code", code);
 		String configstr= AuthHelper.getConfig(request);
+		if(StringUtil.isNotBlank(power)){
+			model.addAttribute("power", power);
+		}
 		plan editplanPlan=planService.findById(Long.parseLong(id));
 		model.addAttribute("authconfig", configstr);
 		model.addAttribute("plan", editplanPlan);
@@ -122,6 +178,73 @@ public class planContorller {
 		
 		return "plan/planedit";
 	}	
+	/** 跳转添加任务
+	 * @param deptid 部门id
+	 * @param year  年份
+	 * @param model
+	 * @param request
+	 * @return
+	 * @throws OApiException
+	 * @throws UnsupportedEncodingException
+	 */
+	@RequestMapping("/taskadd")
+	public String taskadd(@RequestParam(value="deptid",required=false)String deptid,
+			@RequestParam(value="year",required=false)String year,
+			@RequestParam(value="planid",required=false)String planid,
+			@RequestParam(value="pid",required=false)String pid,
+			@RequestParam(value="id",required=false)String id,Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		//model.addAttribute("code", code);
+		String configstr= AuthHelper.getConfig(request);
+		
+		plan newPlan=new plan();
+		if(StringUtil.isNotBlank(id)){
+			newPlan=planService.findById(Long.parseLong(id));
+			model.addAttribute("oper", "edit");
+		}else{
+			newPlan.setDeptid(deptid);
+			newPlan.setYear(year);
+			newPlan.setPid(pid);
+			newPlan.setPlanid(planid);
+			newPlan.setJindu("0");
+			model.addAttribute("oper", "add");
+		}
+		
+		model.addAttribute("authconfig", configstr);
+		
+		model.addAttribute("plan", newPlan);
+		return "plan/taskadd";
+	}	
+	
+	
+	
+	
+	/** 跳转任务视图
+	 * @param id 计划id
+	 * @param model
+	 * @param request
+	 * @return
+	 * @throws OApiException
+	 * @throws UnsupportedEncodingException
+	 */
+	@RequestMapping("/taskview")
+	public String taskview(@RequestParam(value="id",required=false)String id,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		//model.addAttribute("code", code);
+		String configstr= AuthHelper.getConfig(request);
+		plan editplanPlan=planService.findById(Long.parseLong(id));
+		model.addAttribute("authconfig", configstr);
+		model.addAttribute("plan", editplanPlan);
+		Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
+		JSONObject userJsonObject=null;
+		for(Cookie cookie : cookies){
+			if(cookie.getName().equals("user")){
+				userJsonObject=JSON.parseObject(URLDecoder.decode(cookie.getValue(),"UTF-8"));
+			}
+		}
+		int index=editplanPlan.getFuzherenid().indexOf(userJsonObject.get("userid").toString());
+		model.addAttribute("fuzhe", index);
+		return "plan/taskview";
+	}
 	
 	/**根据部门和年份获取计划
 	 * @param deptid
@@ -136,10 +259,15 @@ public class planContorller {
 	public @ResponseBody Results  getplanlist(@RequestParam(value="deptid",required=false)String deptid,
 			@RequestParam(value="year",required=false)String year,
 			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
-		List<plan> planlist=planService.findByDeptidAndYear(deptid,year);
+		List<plan> planlist=planService.findByDeptidAndYearAndPid(deptid,year,"0");
 		return new Results(planlist);
 	}
-	
+	@RequestMapping("/gettask")
+	public @ResponseBody Results  gettask(@RequestParam(value="pid",required=false)String pid,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		List<plan> planlist=planService.findByPid(pid);
+		return new Results(planlist);
+	}
 	
 	
 	/**保存计划
@@ -148,12 +276,13 @@ public class planContorller {
 	 * @param request
 	 * @param session
 	 * @return
+	 * @throws UnsupportedEncodingException 
 	 */
 	@RequestMapping("/edit")
 	public @ResponseBody
 	Results edit(@ModelAttribute plan planform,
 				@RequestParam(value = "oper", required = false) String oper,
-				HttpServletRequest request,HttpSession session) {
+				HttpServletRequest request,HttpSession session) throws UnsupportedEncodingException {
 		String message = "修改成功";
 		if (StringUtils.equals("add", oper)) {
 			//planform.setId(null);
@@ -162,7 +291,7 @@ public class planContorller {
 		Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
 		for(Cookie cookie : cookies){
 			if(cookie.getName().equals("user")){
-				JSONObject userJsonObject=JSON.parseObject(URLDecoder.decode(cookie.getValue()));
+				JSONObject userJsonObject=JSON.parseObject(URLDecoder.decode(cookie.getValue(),"UTF-8"));
 				planform.setOperationer(userJsonObject.get("name").toString());
 				planform.setOperationerid(userJsonObject.get("userid").toString());
 			}
@@ -184,14 +313,30 @@ public class planContorller {
 	 * @throws UnsupportedEncodingException
 	 */
 	@RequestMapping("/authuser")
-	public @ResponseBody Results  getauthuser(@RequestParam(value="code",required=false)String code,
+	public @ResponseBody Results  getauthuser(
 			Model model,HttpServletRequest request,
 			HttpServletResponse response) throws OApiException, UnsupportedEncodingException {
 		
-		return  new Results(planService.getdept(request, response, code));
+		return  new Results(planService.getdept(request, response));
 	}
 	
-	
+
+	/** 获得用户信息存储cookie并返回任务列表
+	 * @param code 授权码
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @return  部门列表
+	 * @throws OApiException
+	 * @throws UnsupportedEncodingException
+	 */
+	@RequestMapping("/login")
+	public @ResponseBody Results  login(@RequestParam(value="code",required=false)String code,
+			Model model,HttpServletRequest request,
+			HttpServletResponse response) throws OApiException, UnsupportedEncodingException {
+		
+		return  new Results(planService.loginandtask(request, response, code));
+	}
 	
 	
 	

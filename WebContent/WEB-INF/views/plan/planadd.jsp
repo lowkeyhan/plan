@@ -88,6 +88,7 @@ function submitform(){
                         <input type="hidden" id="oper" name="oper" value="${oper}"/>
 						<input type="hidden" id="deptid" name="deptid" value="${deptid}"/>
 						<input type="hidden" id="year" name="year" value="${year}"/>
+						<input type="hidden" id="pid" name="pid" value="0"/>
                         <div class="weui_cells weui_cells_form">
                             <div class="weui_cell">
                                 <div class="weui_cell_hd"><label class="weui_label">计划名称</label></div>
