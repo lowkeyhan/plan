@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd"
+		default-lazy-init="true">
+
+	<description>Spring公共配置</description>
+
+	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
+	<context:component-scan base-package="com.techstar">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+
+	<!-- Jpa Entity Manager 配置 -->
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>			
+		<!-- 指定Entity实体类包路径 -->
+		<property name="packagesToScan" >
+        	<array>
+        		<value>com.techstar.**.entity</value>
+        	</array>
+        </property>
+		<property name="jpaProperties">
+			<props>
+			 <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</prop>
+                <prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				
+				<!-- oracle 同一实例下多用户创建相同表，需要配置 schema-->
+				<!--<prop key="hibernate.default_schema">${jdbc.username}</prop>-->				  
+			</props>
+		</property>
+	</bean>
+		
+	<bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+		<property name="databasePlatform">
+			<value>${databasePlatform}</value>
+		</property>
+		<property name="showSql">
+		  <value>false</value>
+		</property>
+		<property name="generateDdl">
+		  <value>true</value>
+		</property> 		
+	</bean>
+
+	<!-- Spring Data Jpa配置, 扫描base-package下所有继承于Repository<T,ID>的接口 -->
+ 	<jpa:repositories base-package="com.techstar.**.jpa"  transaction-manager-ref="transactionManager" entity-manager-factory-ref="entityManagerFactory"/>
+	
+	
+	
+	<!-- 事务管理器配置, Jpa单数据源事务 -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory"/>
+	</bean>
+
+	<!-- 使用annotation定义事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+	
+	<!-- 定义aspectj -->
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
+
+	
+	
+
+	<!-- production环境 -->
+	<beans profile="production">
+		<context:property-placeholder ignore-resource-not-found="true"
+			location="classpath*:/application.properties" />	
+
+		<!-- 数据源定义,使用c3p0 连接池 -->
+		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+			destroy-method="close">
+<!-- 			<property name="automaticTestTable" value="C3P0TESTTABLE" /> -->
+			<property name="driverClass" value="${jdbc.driver}" />
+			<property name="jdbcUrl" value="${jdbc.url}" />
+			<property name="user" value="${jdbc.username}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="initialPoolSize" value="5" />
+			<property name="minPoolSize" value="5" />
+			<property name="maxPoolSize" value="30" />
+			<property name="acquireIncrement" value="2" />
+			<property name="maxIdleTime" value="120" />
+			<property name="idleConnectionTestPeriod" value="120" />
+			<property name="breakAfterAcquireFailure" value="false" />
+			<property name="testConnectionOnCheckin" value="true" />
+			<property name="acquireRetryAttempts" value="100" />
+			<property name="acquireRetryDelay" value="1000" />
+		</bean>	
+		
+		<!-- 初始化数据表数据 -->	
+		<!--<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">		
+			<jdbc:script location="classpath:data/import-data.sql" encoding="UTF-8"/>
+		</jdbc:initialize-database>	-->	
+			
+
+	</beans>
+	
+	<!-- local development环境 -->
+	<beans profile="development">
+		<context:property-placeholder ignore-resource-not-found="true"
+			location="classpath*:/application.properties" />	
+
+		<!-- 数据源定义,使用c3p0 连接池 -->
+		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+			destroy-method="close">
+			<property name="automaticTestTable" value="C3P0TESTTABLE" />
+			<property name="driverClass" value="${jdbc.driver}" />
+			<property name="jdbcUrl" value="${jdbc.url}" />
+			<property name="user" value="${jdbc.username}" />
+			<property name="password" value="${jdbc.password}" />
+			<property name="initialPoolSize" value="1" />
+			<property name="minPoolSize" value="2" />
+			<property name="maxPoolSize" value="5" />
+			<property name="acquireIncrement" value="2" />
+			<property name="maxIdleTime" value="120" />
+			<property name="idleConnectionTestPeriod" value="120" />
+			<property name="breakAfterAcquireFailure" value="false" />
+			<property name="testConnectionOnCheckin" value="true" />
+			<property name="acquireRetryAttempts" value="100" />
+			<property name="acquireRetryDelay" value="1000" />
+		</bean>		
+
+	</beans>
+	
+
+	
+</beans>
