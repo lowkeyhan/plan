@@ -181,8 +181,8 @@ public class AuthHelper {
 		String queryStringEncode = null;
 		String url;
 		if (queryString != null) {
-			queryStringEncode = URLDecoder.decode(queryString,"UTF-8");
-			url = urlString + "?" + queryStringEncode;
+			//queryStringEncode = URLDecoder.decode(queryString,"UTF-8");
+			url = urlString + "?" + queryString;
 		} else {
 			url = urlString;
 		}

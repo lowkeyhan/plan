@@ -60,4 +60,7 @@ public class PlancheckService {
 	public List<plancheck> findByDeptidInAndYearAndState(List<String> deptidlist,String year,String state){
 		return plancheckDao.findByDeptidInAndYearAndState(deptidlist, year, state);
 	}
+	public List<plancheck> findByState(String state){
+		return plancheckDao.findByState(state);
+	}
 }

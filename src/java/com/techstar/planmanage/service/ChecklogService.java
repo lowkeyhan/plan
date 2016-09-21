@@ -64,4 +64,8 @@ public class ChecklogService {
 	public List<checklog> findByCheckidAndTypeOrderByIdDesc(String taskid,String type) {
 		return checklogdao.findByCheckidAndTypeOrderByIdDesc(taskid, type);
 	}
+	public List<checklog> findByCheckidAndTypeInOrderByIdDesc(String taskid,List<String> typelist){
+		
+		return checklogdao.findByCheckidAndTypeInOrderByIdDesc(taskid, typelist);
+	}
 }

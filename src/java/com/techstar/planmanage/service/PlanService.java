@@ -92,7 +92,7 @@ public class PlanService {
 				deptList.add(depStrings[0]);
 			}
 		}
-		List<plancheck> sPlanchecks=plancheckService.findByDeptidInAndYearAndState(deptList, yearString, "3");
+		List<plancheck> sPlanchecks=plancheckService.findByDeptidInAndYearAndState(deptList, yearString, "4");
 		//获得已审核部门
 		List<String> sdept=new ArrayList<String>();
 		sdept.add("0");
@@ -136,5 +136,34 @@ public class PlanService {
 		}
 		}
 		return mydList;
+	}
+	
+	public List<plan> getplanjindu(String deptid,String year){
+		List<plan> listallPlans=planDao.findByDeptidAndYearAndPid(deptid, year, "0");
+		for (plan parentplan : listallPlans) {
+			List<plan> lv1taskList=planDao.findByPidAndIsdel(parentplan.getId().toString(),"0");
+			int lv1size=lv1taskList.size();
+			Double planjindu=0.00;
+			for (plan lv1task : lv1taskList) {
+				//获得lv1任务进度
+				List<plan> lv2taskList=planDao.findByPidAndIsdel(lv1task.getId().toString(),"0");
+				int lv2size=lv2taskList.size();
+				Double lv1jindu=0.00;
+				if(lv2size>0){
+					for (plan lv2task : lv2taskList) {
+						lv1jindu+=Double.parseDouble(lv2task.getJindu()==null?"0":lv2task.getJindu())*(1.00/lv2size);
+					}
+				}else{
+					lv1jindu=Double.parseDouble(lv1task.getJindu()==null?"0":lv1task.getJindu());
+				}
+				//获得lv1任务进度结束
+				//开始累计计划任务进度
+				planjindu+=lv1jindu*(1.00/lv1size);
+			}
+			//记录plan进度
+			parentplan.setJindu(planjindu+"");
+		}
+		return listallPlans;
+		
 	}
 }

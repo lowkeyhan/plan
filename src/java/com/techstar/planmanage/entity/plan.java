@@ -47,6 +47,8 @@ public class plan  {
 	private String fuzherenid;
 	private String ziyuanpeizhi;
 	private String jindu;
+	private String isdel;//是否删除
+	private String delsm;//删除
 	
 	public String getFuzherenname() {
 		return fuzherenname;
@@ -169,6 +171,18 @@ public class plan  {
 	}
 	public void setPlanid(String planid) {
 		this.planid = planid;
+	}
+	public String getIsdel() {
+		return isdel;
+	}
+	public void setIsdel(String isdel) {
+		this.isdel = isdel;
+	}
+	public String getDelsm() {
+		return delsm;
+	}
+	public void setDelsm(String delsm) {
+		this.delsm = delsm;
 	}
 	
 	

@@ -61,10 +61,20 @@ dd.ready(function(){
 	    	  success: function(data){
 	    	    var listtask="";
 		    	    $.each(data.userdata,function(i,n){
-			               listtask+=" <a href=\"${ctx}/plan/planview?dd_nav_bgcolor=FF30A8A5&checkid="+n.id+"&deptid="+n.deptid+"&power=shenpi\" class=\"weui_media_box weui_media_text \" name=\""+n.id+"\" >";
+		    	    	if(n.type=="计划审核"){
+		    	    		listtask+=" <a href=\"${ctx}/plan/planview?dd_nav_bgcolor=FF30A8A5&checkid="+n.id+"&deptid="+n.deptid+"&power=shenpi\" class=\"weui_media_box weui_media_text \" name=\""+n.id+"\" >";
 				  	    	listtask+="<p class=\"weui_media_desc\">"+n.year+"年"+n.deptname+n.type+"</p>";
-				  	    	
 				  	    	listtask+="</a>";
+		    	    	}else if(n.type=="变更"){
+		    	    		listtask+=" <a href=\"${ctx}/change/shenhechange?dd_nav_bgcolor=FF30A8A5&id="+n.id+"&tid="+n.taskid+"&cid="+n.changeid+"\" class=\"weui_media_box weui_media_text \" name=\""+n.id+"\" >";
+				  	    	listtask+="<p class=\"weui_media_desc\">"+n.year+"年"+n.deptname+"任务"+n.type+"申请</p>";
+				  	    	listtask+="</a>";
+		    	    	}else if(n.type=="撤销"){
+		    	    		listtask+=" <a href=\"${ctx}/change/shenhedel?dd_nav_bgcolor=FF30A8A5&id="+n.id+"&tid="+n.taskid+"\" class=\"weui_media_box weui_media_text \" name=\""+n.id+"\" >";
+				  	    	listtask+="<p class=\"weui_media_desc\">"+n.year+"年"+n.deptname+"任务"+n.type+"申请</p>";
+				  	    	listtask+="</a>";
+		    	    	}
+			               
 				  	    	 
 		    	     });
 		            document.getElementById("deptlistdiv").innerHTML=listtask;

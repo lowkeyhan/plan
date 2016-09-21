@@ -36,6 +36,24 @@
 		   padding-left: 5px;
 		   padding-right: 5px;
 		}
+		.weui_media_box.weui_media_text .weui_media_info {
+		    margin-top: 5px;
+		    padding-bottom: 5px;
+		    font-size: 13px;
+		    color: #cecece;
+		    line-height: 16px;
+		    list-style: none;
+		    overflow: hidden;
+		}
+		.weui_progress_opr {
+    display: block;
+    margin-left: 15px;
+    font-size: 12px;
+}
+.weui_media_box {
+    padding: 10px 15px;
+    position: relative;
+}
     </style>
 </head>
 <body>
@@ -76,7 +94,7 @@ dd.error(function(err) {
 function getplanlist(){
 	$.ajax({
   	  type: 'POST',
-  	  url: '${ctx}/plan/getplan',
+  	  url: '${ctx}/plan/getplanjindu',
   	  data: { deptid: deptid,
   		  	year:$("#selectyear").val()	
   	  		},
@@ -91,6 +109,16 @@ function getplanlist(){
   	    	 listdept+="<li class=\"weui_media_info_meta\">"+n.level+"</li>";
   	    	 listdept+="<li class=\"weui_media_info_meta weui_media_info_meta_extra\">权重："+n.weight+"%</li>";
   	    	 listdept+="</ul>";
+  	    	 
+  	    	listdept+="<div class=\"weui_progress\">";
+  	    	listdept+="    <div class=\"weui_progress_bar\">";
+  	    	listdept+="       <div class=\"weui_progress_inner_bar js_progress\" style=\"width: "+n.jindu+"%;\"></div>";
+  	    	listdept+="   </div>";
+  	    	listdept+="   <div  class=\"weui_progress_opr\">";
+  	    	listdept+=n.jindu+"%";
+  	    	listdept+="    </div>";
+  	    	listdept+="</div>";
+  	    	
   	    	 listdept+="</a>";
   	     	});
 	            document.getElementById("planlistdiv").innerHTML=listdept;

@@ -85,7 +85,10 @@ public class checklogContorller {
 			@RequestParam(value="type",required=false)String type,
 			Model model,HttpServletRequest request,
 			HttpServletResponse response) throws OApiException, UnsupportedEncodingException {
-		List<checklog> listcheckList=checklogService.findByCheckidAndTypeOrderByIdDesc(checkid, type);
+		List<String> typeList=new ArrayList<>();
+		typeList.add("zhuguan");
+		typeList.add("zongjian");
+		List<checklog> listcheckList=checklogService.findByCheckidAndTypeInOrderByIdDesc(checkid, typeList);
 		
 		return  new Results(listcheckList);
 	}

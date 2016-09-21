@@ -97,6 +97,18 @@ public class plancheckContorller {
 		model.addAttribute("plancheck", planchecks);
 		return "plan/shenpiadd";
 	}
+	
+	/**
+	 * 根据部门和年份获取当前计划状态
+	 * @param deptid
+	 * @param year
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws OApiException
+	 * @throws UnsupportedEncodingException
+	 */
 	@RequestMapping("/getstate")
 	public @ResponseBody Results  getstate(@RequestParam(value="deptid",required=false)String deptid,
 			@RequestParam(value="year",required=false)String year,
@@ -114,24 +126,37 @@ public class plancheckContorller {
 		return  new Results(checkidString,stateString);
 	}
 	
+	/**
+	 * 计划提交审核
+	 * @param deptid 部门id
+	 * @param year  计划年份
+	 * @param deptname  编码的部门名称
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws OApiException
+	 * @throws UnsupportedEncodingException
+	 */
 	@RequestMapping("/subplan")
 	public @ResponseBody Results  subplan(@RequestParam(value="deptid",required=false)String deptid,
 			@RequestParam(value="year",required=false)String year,
 			@RequestParam(value="deptname",required=false)String deptname,
 			Model model,HttpServletRequest request,
 			HttpServletResponse response) throws OApiException, UnsupportedEncodingException {
+		//获得用户信息
 		Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
 		JSONObject userJsonObject = null;
 		for(Cookie cookie : cookies){
 			if(cookie.getName().equals("user")){
 				 userJsonObject=JSON.parseObject(URLDecoder.decode(cookie.getValue(),"UTF-8"));
-				//planform.setOperationer(userJsonObject.get("name").toString());
-				//planform.setOperationerid(userJsonObject.get("userid").toString());
 			}
 		}
+		//根据部门和年份查询是否有审核信息
 		List<plancheck> listcheckList=plancheckService.findByDeptidAndYear(deptid, year);
 		plancheck subPlancheck=new plancheck();
 		if(listcheckList.size()<=0){
+			//没有审核信息时生成本年度审核信息
 			subPlancheck.setDeptid(deptid);
 			subPlancheck.setDeptname(deptname);
 			subPlancheck.setType("计划审核");
@@ -146,10 +171,21 @@ public class plancheckContorller {
 		plancheckService.save(subPlancheck);
 		return  new Results(year+"年计划提交成功");
 	}
+	
+	/**
+	 * 根据角色获得待审核列表
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws OApiException
+	 * @throws UnsupportedEncodingException
+	 */
 	@RequestMapping("/getcheck")
 	public @ResponseBody Results  getcheck(
 			Model model,HttpServletRequest request,
 			HttpServletResponse response) throws OApiException, UnsupportedEncodingException {
+		//获得缓存用户
 		Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
 		JSONObject userJsonObject = null;
 		for(Cookie cookie : cookies){
@@ -159,17 +195,40 @@ public class plancheckContorller {
 				//planform.setOperationerid(userJsonObject.get("userid").toString());
 			}
 		}
+		//获取带审核列表 ，state (1：未提交，2：已提交主管未审核，3：主管审核总监未审核，4：审核通过)
 		List<plancheck> planchecks=new ArrayList<plancheck>();
+		//获得用户主管角色权限
 		List<power> listpowerList=powerService.findByAdminidAndType(userJsonObject.get("userid").toString(), "主管副总");
 		if(listpowerList.size()>0){
+			//根据主管部门获得部门计划审核列表
 			List<String> idList=new ArrayList<String>();
 			String[] idstrStrings=listpowerList.get(0).getDeptid().split(",");
 			Collections.addAll(idList, idstrStrings);
 			planchecks=plancheckService.findByDeptidInAndState(idList, "2");
 		}
+		if(planchecks.size()<=0){
+			//获得用户总监权限
+			List<power> zlistpowerList=powerService.findByAdminidAndType(userJsonObject.get("userid").toString(), "战略总监");
+			if(zlistpowerList.size()>0){
+				//总监处理所有部门计划总监审核
+				planchecks=plancheckService.findByState( "3");
+			}
+		}
 		return  new Results(planchecks);
 	}
 	
+	/**
+	 * 保存审核结果并记录
+	 * @param state 1：未提交，2：已提交主管未审核，3：主管审核总监未审核，4：审核通过)
+	 * @param checkid 审核id
+	 * @param shuju  说明
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws OApiException
+	 * @throws UnsupportedEncodingException
+	 */
 	@RequestMapping("/shenpistate")
 	public @ResponseBody Results  shenpistate(@RequestParam(value="state",required=false)String state,
 			@RequestParam(value="checkid",required=false)String checkid,
@@ -177,8 +236,16 @@ public class plancheckContorller {
 			Model model,HttpServletRequest request,
 			HttpServletResponse response) throws OApiException, UnsupportedEncodingException {
 		plancheck plancheckstate=plancheckService.findById(Long.parseLong(checkid));
+		//获得原来的状态信息判断审核人身份
+		String oldstateString=plancheckstate.getState();
+		String checktype="zhuguan";
+		if(oldstateString.equals("3")){
+			checktype="zongjian";
+		}
+		//赋予新的状态
 		plancheckstate.setState(state);
 		plancheckService.save(plancheckstate);
+		//获得用户信息
 		Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
 		JSONObject userJsonObject = null;
 		for(Cookie cookie : cookies){
@@ -188,6 +255,7 @@ public class plancheckContorller {
 				//planform.setOperationerid(userJsonObject.get("userid").toString());
 			}
 		}
+		//保存审核记录，记录审核人审核信息
 		checklog checklog=new checklog();
 		checklog.setCheckid(plancheckstate.getId().toString());
 		checklog.setDeptid(plancheckstate.getDeptid());
@@ -199,7 +267,7 @@ public class plancheckContorller {
 			checklog.setShuoming("审核不通过");
 		}
 		checklog.setShuju(shuju);
-		checklog.setType("zhuguan");
+		checklog.setType(checktype);
 		checklog.setYear(plancheckstate.getYear());
 		checklog.setState(state);
 		checklogService.save(checklog);

@@ -65,11 +65,19 @@ dd.error(function(err) {
 
 //
 function submitplan(state){
+	var nowstate='1';
+	if(state=='2'){
+		nowstate='3';
+	}else if(state=='3'){
+		nowstate='4';
+	}else{
+		nowstate='1';
+	}
 	$.ajax({
   	  type: 'POST',
   	  url: '${ctx}/check/shenpistate',
   	  data: {
-  		state:state,
+  		state:nowstate,
   		checkid:"${plancheck.id}",
   		shuju:$("#shuju").val()
   	  },
@@ -87,7 +95,7 @@ function submitplan(state){
 </script>
  <form id="planform" action="${ctx}/plan/edit" method="POST">
 						<input type="hidden" id="id" name="id" value="${plancheck.id}"/>
-                        
+                        <input type="hidden" id="state" name="state" value="${plancheck.state}"/>
                         <div class="weui_cells weui_cells_access">
 					        <a class="weui_cell" href="${ctx}/plan/planview?dd_nav_bgcolor=FF30A8A5&checkid=${plancheck.id}&deptid=${plancheck.deptid}&power=shenpi">
 					            <div class="weui_cell_bd weui_cell_primary">
@@ -111,8 +119,8 @@ function submitplan(state){
                     </form>
                     <div class="approve-foot show">
 <div class="tFlexbox tAlignCenter tJustifyCenter" id="btnlist">
-<div class="tFlex1 approval-action tTap agree"  onclick="submitplan('3')" >同意</div>
-<div class="tFlex1 approval-action tTap agree"  onclick="submitplan('1')" >拒绝</div>	  	    	
+<div class="tFlex1 approval-action tTap agree"  onclick="submitplan('${plancheck.state}')" >同意</div>
+<div class="tFlex1 approval-action tTap agree"  onclick="submitplan('0')" >拒绝</div>	  	    	
 </div>
 </div>
 </body>

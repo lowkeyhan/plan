@@ -43,6 +43,9 @@
 		.planchind{
 			display:none;
 		}
+		.delfont{
+			text-decoration:line-through;
+		}
     </style>
 </head>
 <body>
@@ -169,7 +172,7 @@
                <div class="weui_actionsheet_cell planchind" id="tasklook">查看任务</div>
             <div class="weui_actionsheet_cell planchind" id="taskchange">申请变更</div>
          
-            <div class="weui_actionsheet_cell planchind" id="deltask">申请删除</div>
+            <div class="weui_actionsheet_cell planchind" id="deltask">申请撤销</div>
             <input type="hidden" id="tpid" name="tpid" />
             <input type="hidden" id="leve" name="leve" />
             <input type="hidden" id="taskstate" name=""taskstate"" />
@@ -262,6 +265,14 @@ dd.ready(function(){
 	$("#tasklook").on('click', function () {
 		window.location.href="${ctx}/plan/taskview?dd_nav_bgcolor=FF30A8A5&id="+$("#tpid").val();
 	});
+	//申请变更
+	$("#taskchange").on('click', function () {
+		window.location.href="${ctx}/change/taskchange?dd_nav_bgcolor=FF30A8A5&id="+$("#tpid").val();
+	});
+	//申请撤销
+	$("#deltask").on('click', function () {
+		window.location.href="${ctx}/change/taskdel?dd_nav_bgcolor=FF30A8A5&id="+$("#tpid").val();
+	});
 	
 	    
 });
@@ -326,7 +337,13 @@ function getoneleveltask(pid){
 	  	    var listtask="";
 	  	     $.each(data.userdata,function(i,n){
 	  	    	 
-	  	    	listtask+=" <a  class=\"weui_media_box weui_media_text onetask \" name=\""+n.id+"\" onclick=\"openplaninfo('"+n.id+"')\">";
+	  	    	listtask+=" <a  class=\"weui_media_box weui_media_text onetask ";
+	  	    	if(n.isdel=="1"){
+	  	    		listtask+=" delfont \" name=\""+n.id+"\" >";
+	  	    	}else{
+	  	    		listtask+=" \" name=\""+n.id+"\" onclick=\"openplaninfo('"+n.id+"')\">";
+	  	    	}
+	  	    	
 	  	    	listtask+="<p class=\"weui_media_desc\">"+n.title+"</p>";
 	  	    	listtask+="<ul class=\"weui_media_info\">";
 				if(n.fuzherenname!=null&&n.fuzherenname!=""){
@@ -372,7 +389,13 @@ function gettwoleveltask(pid){
 	  	    
 	  	     $.each(data.userdata,function(i,n){
 	  	    	 
-	  	    	listtask+=" <a  class=\"weui_media_box weui_media_text twotask \" name=\""+n.id+"\" >";
+	  	    	listtask+=" <a  class=\"weui_media_box weui_media_text twotask ";
+	  	    		if(n.isdel=="1"){
+		  	    		listtask+=" delfont \" name=\""+n.id+"\" >";
+		  	    	}else{
+		  	    		listtask+=" \" name=\""+n.id+"\" >";
+		  	    	}
+	  	    	
 	  	    	listtask+="<p class=\"weui_media_desc\">"+n.title+"</p>";
 	  	    	listtask+="<ul class=\"weui_media_info\">";
 				if(n.fuzherenname!=null&&n.fuzherenname!=""){
@@ -386,7 +409,7 @@ function gettwoleveltask(pid){
 	  	    	listtask+="</a>";
 	  	    	 
 	  	     	});
-	  	   listtask+="</div>"
+	  	   listtask+="</div>";
 		            document.getElementById(pid).innerHTML=listtask;
 		            $('.twotask').longTap(function(){
 		            	$("#twotask").hide();

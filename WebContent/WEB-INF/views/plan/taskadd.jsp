@@ -39,7 +39,7 @@
 </head>
 <body>
 
- <form id="planform" action="${ctx}/plan/edit" method="POST">
+ <form id="planform"  method="POST">
                         <input type="hidden" id="oper" name="oper" value="${oper}"/>
 						<input type="hidden" id="deptid" name="deptid" value="${plan.deptid}"/>
 						<input type="hidden" id="year" name="year" value="${plan.year}"/>
@@ -94,7 +94,7 @@
                                 </div>
                             </div>
                         </div>
-
+						
                     </form>
                     <input type="button" id="submit_${uuid}" onclick="submitform();"
                            class="weui_btn weui_btn_primary"

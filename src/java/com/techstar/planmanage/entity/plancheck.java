@@ -31,8 +31,11 @@ public class plancheck  {
 	private String year;//年份
 	private String deptid;//部门id
 	private String deptname;
-	private String state;
+	private String state;//1：未提交，2：已提交主管未审核，3：主管审核总监未审核，4：审核通过)
 	private String type;
+	private String taskid;
+	private String changeid;//
+	
 	public Long getId() {
 		return id;
 	}
@@ -75,9 +78,17 @@ public class plancheck  {
 	public void setDeptname(String deptname) {
 		this.deptname = deptname;
 	}
+	/**
+	 * 1：未提交，2：已提交主管未审核，3：主管审核总监未审核，4：审核通过)
+	 * @return
+	 */
 	public String getState() {
 		return state;
 	}
+	/**
+	 * 1：未提交，2：已提交主管未审核，3：主管审核总监未审核，4：审核通过)
+	 * @param state
+	 */
 	public void setState(String state) {
 		this.state = state;
 	}
@@ -86,6 +97,18 @@ public class plancheck  {
 	}
 	public void setType(String type) {
 		this.type = type;
+	}
+	public String getTaskid() {
+		return taskid;
+	}
+	public void setTaskid(String taskid) {
+		this.taskid = taskid;
+	}
+	public String getChangeid() {
+		return changeid;
+	}
+	public void setChangeid(String changeid) {
+		this.changeid = changeid;
 	}
 	
 	

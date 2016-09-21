@@ -49,6 +49,17 @@ public class DepartmentHelper {
 		}
 	}
 	
+	public static Department findoneDepartments(String accessToken,String id) 
+			throws OApiException {
+		String url = Env.OAPI_HOST + "/department/get?" +
+				"access_token=" + accessToken+"&id="+id;
+		JSONObject response = HttpHelper.httpGet(url);
+		Department getdDepartment=new Department();
+		getdDepartment.id=response.get("id").toString();
+		getdDepartment.name=response.get("name").toString();
+		getdDepartment.parentid=response.get("parentid").toString();
+		return getdDepartment;
+	}
 	
 	public static void deleteDepartment(String accessToken, Long id) throws OApiException{
 		String url = Env.OAPI_HOST  + "/department/delete?" +

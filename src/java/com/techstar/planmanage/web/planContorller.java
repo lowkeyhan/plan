@@ -29,7 +29,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.techstar.planmanage.entity.plan;
+import com.techstar.planmanage.entity.planchange;
 import com.techstar.planmanage.service.PlanService;
+import com.techstar.planmanage.service.PlanchangeService;
 import com.techstar.sys.Util.StringUtil;
 import com.techstar.sys.config.Global;
 import com.techstar.sys.dingAPI.OApiException;
@@ -51,6 +53,9 @@ import com.techstar.sys.jpadomain.Results;
 public class planContorller {
 	@Autowired
 	private PlanService planService;
+	@Autowired
+	private PlanchangeService planchangeService;
+	
 	
 	@RequestMapping("/index")
 	public String test(Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
@@ -246,6 +251,12 @@ public class planContorller {
 		return "plan/taskview";
 	}
 	
+
+
+	
+	
+	
+	
 	/**根据部门和年份获取计划
 	 * @param deptid
 	 * @param year
@@ -262,6 +273,8 @@ public class planContorller {
 		List<plan> planlist=planService.findByDeptidAndYearAndPid(deptid,year,"0");
 		return new Results(planlist);
 	}
+	
+	//根据父id获得子任务
 	@RequestMapping("/gettask")
 	public @ResponseBody Results  gettask(@RequestParam(value="pid",required=false)String pid,
 			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
@@ -338,6 +351,25 @@ public class planContorller {
 		return  new Results(planService.loginandtask(request, response, code));
 	}
 	
+	
+	
+	
+	/**统计部门当年进度
+	 * @param deptid
+	 * @param year
+	 * @param model
+	 * @param request
+	 * @return
+	 * @throws OApiException
+	 * @throws UnsupportedEncodingException
+	 */
+	@RequestMapping("/getplanjindu")
+	public @ResponseBody Results  getplanjindu(@RequestParam(value="deptid",required=false)String deptid,
+			@RequestParam(value="year",required=false)String year,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		List<plan> planlist=planService.getplanjindu(deptid,year);
+		return new Results(planlist);
+	}
 	
 	
 }

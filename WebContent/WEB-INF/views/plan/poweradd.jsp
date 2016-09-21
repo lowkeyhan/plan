@@ -50,6 +50,7 @@
                                 <div class="weui_cell_bd weui_cell_primary">
                                     <select class="weui_select" name="type" id="type" onchange="typeChange()" >
                                         <option value="主管副总">主管副总</option>
+                                        <option value="战略总监">战略总监</option>
                                         <option value="计划查看">计划查看</option>
                                     </select>
                                 </div>

@@ -34,6 +34,7 @@ public interface checklogDao<T, ID extends Serializable> extends JpaRepository<c
 	public List<checklog> findByTaskid(String taskid) ;
 	public List<checklog> findByTaskidAndTypeOrderByIdDesc(String taskid,String type) ;
 	List<checklog> findByCheckidAndTypeOrderByIdDesc(String taskid,String type) ;
+	List<checklog> findByCheckidAndTypeInOrderByIdDesc(String taskid,List<String> typelist);
    //List<Events> ceventslist=eventsService.findBy("StarttimeGreaterThanAndStarttimeLessThanAndParticipantidLike", sDate, eDate,userid);
 }
 		
