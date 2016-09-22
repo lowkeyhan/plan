@@ -50,7 +50,7 @@
 						<input type="hidden" id="jindu" name="jindu" value="${plan.jindu}"/>
                         <div class="weui_cells weui_cells_form">
                             <div class="weui_cell">
-                                <div class="weui_cell_hd"><label class="weui_label">任务内容</label></div>
+                                <div class="weui_cell_hd"><label class="weui_label">计划名称</label></div>
                                 <div class="weui_cell_bd weui_cell_primary">
                                     <input class="weui_input" id="title"  name="title"
                                            type="text" value='${plan.title}'>
@@ -58,43 +58,61 @@
                             </div>
                         </div>
                         <div class="weui_cells weui_cells_form">
-                        <div class="weui_cell">
-                                <div class="weui_cell_hd"><label class="weui_label">开始时间</label></div>
-                                <div class="weui_cell_bd weui_cell_primary">
-                               <input class="weui_input" id="stime"  name="stime"
-                                           type="date" value='${plan.stime}'>
-                                </div>
-                            </div>
-                           <div class="weui_cell">
+                            <div class="weui_cell weui_cell_select weui_select_after">
                                 <div class="weui_cell_hd">
-                                    <label for="" class="weui_label">结束时间</label>
+                                    <label for="" class="weui_label">计划级别</label>
                                 </div>
                                 <div class="weui_cell_bd weui_cell_primary">
-                                     <input class="weui_input" id="endtime"  name="endtime"
-                                           type="date" value='${plan.endtime}'>
+                                    <select class="weui_select" name="level" id=selectlevel>
+                                        <option value="公司计划">公司计划</option>
+                                        <option value="部门计划">部门计划</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="weui_cells weui_cells_form">
+                            <div class="weui_cell weui_cell_select weui_select_after">
+                                <div class="weui_cell_hd">
+                                    <label for="" class="weui_label">计划类别</label>
+                                </div>
+                                <div class="weui_cell_bd weui_cell_primary">
+                                    <select class="weui_select" name="type" id="selecttype">
+                                        <option value="管理类计划">管理类计划</option>
+                                        <option value="研发类计划">研发类计划</option>
+                                        <option value="项目类计划">项目类计划</option>
+                                        <option value="营销类计划">营销类计划</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="weui_cells weui_cells_form">
                             <div class="weui_cell">
-                                <div class="weui_cell_hd"><label class="weui_label">负责人</label></div>
+                                <div class="weui_cell_hd"><label class="weui_label">计划目标</label></div>
                                 <div class="weui_cell_bd weui_cell_primary">
-                                    <input class="weui_input" id="fuzherenname"  name="fuzherenname"
-                                           type="text" value='${plan.fuzherenname}'>
-                                            <input  type="hidden"  id="fuzherenid"  name="fuzherenid"
-                                           type="text" value='${plan.fuzherenid}'>
+                                    <input class="weui_input" id="target" name="target"
+                                           type="text" value='${plan.target}'>
                                 </div>
                             </div>
                         </div>
                         <div class="weui_cells weui_cells_form">
                             <div class="weui_cell">
-                                <div class="weui_cell_hd"><label class="weui_label">资源配置</label></div>
+                                <div class="weui_cell_hd"><label class="weui_label">权重比例</label></div>
                                 <div class="weui_cell_bd weui_cell_primary">
-                                    <input class="weui_input" id="ziyuanpeizhi"  name="ziyuanpeizhi"
-                                           type="text" value='${plan.ziyuanpeizhi}'>
+                                    <input class="weui_input" id="weight"  name="weight"
+                                           type="number" value='${plan.weight}'>
                                 </div>
                             </div>
                         </div>
+                        <div class="weui_cells weui_cells_form">
+                            <div class="weui_cell">
+                                <div class="weui_cell_hd"><label class="weui_label">考核指标</label></div>
+                                <div class="weui_cell_bd weui_cell_primary">
+                                    <input class="weui_input" id="ssessmentindex"  name="ssessmentindex"
+                                           type="text" value='${plan.ssessmentindex}'>
+                                </div>
+                            </div>
+                        </div>
+
 						 <div class="weui_cells weui_cells_form">
 				        <div class="weui_cell">
 				            <div class="weui_cell_bd weui_cell_primary">
@@ -124,7 +142,18 @@ dd.error(function(err) {
 	alert('sdfs');
 	alert('dd error: ' + JSON.stringify(err));
 });
-
+Zepto(function ($) {
+    if("${plan.type}"==""){
+		$("#selecttype").val("管理类计划");
+	}else{
+		$("#selecttype").val("${plan.type}");
+	}
+    if("${plan.level}"==""){
+		$("#selectlevel").val("公司计划");
+	}else{
+		$("#selectlevel").val("${plan.level}");
+	}
+});
 
 //
 function submitform(){
@@ -135,7 +164,7 @@ function submitform(){
   	  dataType: 'json',
   	  success: function(data){
   		successalert(data.message);    
-  	  //location.href="${ctx}/plan/planedit?id=${plan.planid}";
+  	  location.href="${ctx}/plan/planedit?id=${plan.planid}&pwoer=true";
   	  },
   	  error: function(xhr, type,error){
   	    alert('Ajax error!');

@@ -67,6 +67,20 @@ var deptname="${deptname}";
 
 
 dd.ready(function(){
+	dd.biz.navigation.setLeft({
+	    show: true,//控制按钮显示， true 显示， false 隐藏， 默认true
+	    control: true,//是否控制点击事件，true 控制，false 不控制， 默认false
+	    showIcon: true,//是否显示icon，true 显示， false 不显示，默认true； 注：具体UI以客户端为准
+	    text: '返回',//控制显示文本，空字符串表示显示默认文本
+	    onSuccess : function(result) {
+	        /*
+	        {}
+	        */
+	        //如果control为true，则onSuccess将在发生按钮点击事件被回调
+	    	window.location.href="${ctx}/plan/index?dd_nav_bgcolor=FF30A8A5";
+	    },
+	    onFail : function(err) {}
+	});
 	//指定默认年份
 	$("#selectyear").val("${year}");
 	//加载默认年份计划

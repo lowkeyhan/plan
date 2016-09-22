@@ -35,7 +35,7 @@ public class plancheck  {
 	private String type;
 	private String taskid;
 	private String changeid;//
-	
+	private String pid;//
 	public Long getId() {
 		return id;
 	}
@@ -109,6 +109,12 @@ public class plancheck  {
 	}
 	public void setChangeid(String changeid) {
 		this.changeid = changeid;
+	}
+	public String getPid() {
+		return pid;
+	}
+	public void setPid(String pid) {
+		this.pid = pid;
 	}
 	
 	

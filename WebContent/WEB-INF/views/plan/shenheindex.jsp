@@ -52,7 +52,20 @@ dd.config({
 						'device.notification.showPreloader','device.notification.hidePreloader','biz.navigation.close' ]
 });
 dd.ready(function(){
-	
+	dd.biz.navigation.setLeft({
+	    show: true,//控制按钮显示， true 显示， false 隐藏， 默认true
+	    control: true,//是否控制点击事件，true 控制，false 不控制， 默认false
+	    showIcon: true,//是否显示icon，true 显示， false 不显示，默认true； 注：具体UI以客户端为准
+	    text: '返回',//控制显示文本，空字符串表示显示默认文本
+	    onSuccess : function(result) {
+	        /*
+	        {}
+	        */
+	        //如果control为true，则onSuccess将在发生按钮点击事件被回调
+	    	window.location.href="${ctx}/plan/index?dd_nav_bgcolor=FF30A8A5";
+	    },
+	    onFail : function(err) {}
+	});
 	    $.ajax({
 	    	  type: 'POST',
 	    	  url: '${ctx}/check/getcheck',
@@ -61,16 +74,22 @@ dd.ready(function(){
 	    	  success: function(data){
 	    	    var listtask="";
 		    	    $.each(data.userdata,function(i,n){
+		    	    	var changepage="shenhechange";
+		    	    	var delpage="shenhedel";
+		    	    	if(n.pid=="0"){
+		    	    		var changepage="shenheplanchange";
+			    	    	var delpage="shenheplandel";
+		    	    	}
 		    	    	if(n.type=="计划审核"){
 		    	    		listtask+=" <a href=\"${ctx}/plan/planview?dd_nav_bgcolor=FF30A8A5&checkid="+n.id+"&deptid="+n.deptid+"&power=shenpi\" class=\"weui_media_box weui_media_text \" name=\""+n.id+"\" >";
 				  	    	listtask+="<p class=\"weui_media_desc\">"+n.year+"年"+n.deptname+n.type+"</p>";
 				  	    	listtask+="</a>";
 		    	    	}else if(n.type=="变更"){
-		    	    		listtask+=" <a href=\"${ctx}/change/shenhechange?dd_nav_bgcolor=FF30A8A5&id="+n.id+"&tid="+n.taskid+"&cid="+n.changeid+"\" class=\"weui_media_box weui_media_text \" name=\""+n.id+"\" >";
+		    	    		listtask+=" <a href=\"${ctx}/change/"+changepage+"?dd_nav_bgcolor=FF30A8A5&id="+n.id+"&tid="+n.taskid+"&cid="+n.changeid+"\" class=\"weui_media_box weui_media_text \" name=\""+n.id+"\" >";
 				  	    	listtask+="<p class=\"weui_media_desc\">"+n.year+"年"+n.deptname+"任务"+n.type+"申请</p>";
 				  	    	listtask+="</a>";
 		    	    	}else if(n.type=="撤销"){
-		    	    		listtask+=" <a href=\"${ctx}/change/shenhedel?dd_nav_bgcolor=FF30A8A5&id="+n.id+"&tid="+n.taskid+"\" class=\"weui_media_box weui_media_text \" name=\""+n.id+"\" >";
+		    	    		listtask+=" <a href=\"${ctx}/change/"+delpage+"?dd_nav_bgcolor=FF30A8A5&id="+n.id+"&tid="+n.taskid+"\" class=\"weui_media_box weui_media_text \" name=\""+n.id+"\" >";
 				  	    	listtask+="<p class=\"weui_media_desc\">"+n.year+"年"+n.deptname+"任务"+n.type+"申请</p>";
 				  	    	listtask+="</a>";
 		    	    	}

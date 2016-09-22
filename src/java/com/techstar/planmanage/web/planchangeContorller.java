@@ -73,6 +73,15 @@ public class planchangeContorller {
 		model.addAttribute("plan", editplanPlan);
 		return "plan/taskchange";
 	}
+	@RequestMapping("/planchange")
+	public String planchange(@RequestParam(value="id",required=false)String id,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		String configstr= AuthHelper.getConfig(request);
+		plan editplanPlan=planService.findById(Long.parseLong(id));
+		model.addAttribute("authconfig", configstr);
+		model.addAttribute("plan", editplanPlan);
+		return "plan/planchange";
+	}
 	@RequestMapping("/savechange")
 	public @ResponseBody
 	Results savechange(@ModelAttribute planchange planform,
@@ -93,6 +102,7 @@ public class planchangeContorller {
 		newPlancheck.setYear(planform.getYear());
 		newPlancheck.setTaskid(planform.getTaskid().toString());
 		newPlancheck.setState("2");
+		newPlancheck.setPid(planform.getPid());
 		planform.setState("2");
 		planform.setId(null);
 		planchangeService.save(planform);
@@ -117,7 +127,22 @@ public class planchangeContorller {
 		model.addAttribute("plancheck", plancheck);
 		return "plan/shenhechange";
 	}
-	
+	@RequestMapping("/shenheplanchange")
+	public String shenheplanchange(@RequestParam(value="id",required=false)String id,
+			@RequestParam(value="tid",required=false)String tid,
+			@RequestParam(value="cid",required=false)String cid,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		String configstr= AuthHelper.getConfig(request);
+		plan editplanPlan=planService.findById(Long.parseLong(tid));
+		planchange changePlan=planchangeService.findById(Long.parseLong(cid));
+		plancheck plancheck=plancheckService.findById(Long.parseLong(id));
+		
+		model.addAttribute("authconfig", configstr);
+		model.addAttribute("plan", editplanPlan);
+		model.addAttribute("changeplan", changePlan);
+		model.addAttribute("plancheck", plancheck);
+		return "plan/shenheplanchange";
+	}
 	/**
 	 * 保存审核结果并记录
 	 * @param state 1：未提交，2：已提交主管未审核，3：主管审核总监未审核，4：审核通过,5：审核通过)
@@ -183,13 +208,19 @@ public class planchangeContorller {
 			planchange.setState(state);
 			planchange.setIsnormal(changexz);
 			
-			//作变更
+			//任务作变更字段
 			plan.setTitle(planchange.getTitle());
 			plan.setStime(planchange.getStime());
 			plan.setEndtime(planchange.getEndtime());
 			plan.setFuzherenid(planchange.getFuzherenid());
 			plan.setFuzherenname(planchange.getFuzherenname());
 			plan.setZiyuanpeizhi(planchange.getZiyuanpeizhi());
+			//计划作变更字段
+			plan.setLevel(planchange.getLevel());
+			plan.setType(planchange.getType());
+			plan.setTarget(planchange.getTarget());
+			plan.setWeight(planchange.getWeight());
+			plan.setSsessmentindex(planchange.getSsessmentindex());
 			
 			planService.save(plan);
 			planchangeService.save(planchange);
@@ -206,6 +237,15 @@ public class planchangeContorller {
 		model.addAttribute("authconfig", configstr);
 		model.addAttribute("plan", editplanPlan);
 		return "plan/taskdel";
+	}
+	@RequestMapping("/plandel")
+	public String plandel(@RequestParam(value="id",required=false)String id,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		String configstr= AuthHelper.getConfig(request);
+		plan editplanPlan=planService.findById(Long.parseLong(id));
+		model.addAttribute("authconfig", configstr);
+		model.addAttribute("plan", editplanPlan);
+		return "plan/plandel";
 	}
 	@RequestMapping("/savedel")
 	public @ResponseBody
@@ -229,6 +269,7 @@ public class planchangeContorller {
 		newPlancheck.setYear(delplan.getYear());
 		newPlancheck.setTaskid(delplan.getId().toString());
 		newPlancheck.setState("2");
+		newPlancheck.setPid(delplan.getPid());
 		
 		plancheckService.save(newPlancheck);
 		delplan.setDelsm(delsm);
@@ -248,6 +289,20 @@ public class planchangeContorller {
 		model.addAttribute("plancheck", plancheck);
 		return "plan/shenhedel";
 	}
+	@RequestMapping("/shenheplandel")
+	public String shenheplandel(@RequestParam(value="id",required=false)String id,
+			@RequestParam(value="tid",required=false)String tid,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		String configstr= AuthHelper.getConfig(request);
+		plan editplanPlan=planService.findById(Long.parseLong(tid));
+		plancheck plancheck=plancheckService.findById(Long.parseLong(id));
+		
+		model.addAttribute("authconfig", configstr);
+		model.addAttribute("plan", editplanPlan);
+		model.addAttribute("plancheck", plancheck);
+		return "plan/shenheplandel";
+	}
+	
 	@RequestMapping("/shdel")
 	public @ResponseBody Results  shdel(@RequestParam(value="state",required=false)String state,
 			@RequestParam(value="id",required=false)String checkid,

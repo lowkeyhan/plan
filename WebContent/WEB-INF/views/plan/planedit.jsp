@@ -133,6 +133,8 @@
                            value="&nbsp;&nbsp;保&nbsp;&nbsp;存&nbsp;&nbsp;"/>
                     <input type="button" id="canbtn" onclick=" gohome();" class="weui_btn weui_btn_default planchind"
                            value="&nbsp;&nbsp;取&nbsp;&nbsp;消&nbsp;&nbsp;"/>
+                    <a id="planchange" href="${ctx}/change/planchange?id=${plan.id}" class="weui_btn weui_btn_primary planchind" >申请变更</a>
+                    <a id="plandel" href="${ctx}/change/plandel?id=${plan.id}" class="weui_btn weui_btn_default planchind" >申请撤销</a>
  </div>
                 <!--计划信息结束-->
                 <!--子任务列表开始-->
@@ -243,9 +245,13 @@ dd.ready(function(){
 	    show: true,//控制按钮显示， true 显示， false 隐藏， 默认true
 	    control: true,//是否控制点击事件，true 控制，false 不控制， 默认false
 	    showIcon: true,//是否显示icon，true 显示， false 不显示，默认true； 注：具体UI以客户端为准
-	    text: '',//控制显示文本，空字符串表示显示默认文本
+	    text: '返回',//控制显示文本，空字符串表示显示默认文本
 	    onSuccess : function(result) {
-	    	window.location.href="${ctx}/plan/planview?dd_nav_bgcolor=FF30A8A5&year=${plan.year}&deptid=${plan.deptid}";
+	        /*
+	        {}
+	        */
+	        //如果control为true，则onSuccess将在发生按钮点击事件被回调
+	    	window.location.href="${ctx}/plan/index?dd_nav_bgcolor=FF30A8A5";
 	    },
 	    onFail : function(err) {}
 	});
@@ -465,6 +471,8 @@ function initpage(){
 	  	    	$("#tasklook").show();
 	  	    	$("#taskchange").show();
 	  	    	$("#deltask").show();
+	  	    	$("#planchange").css("display","block");
+	  	    	$("#plandel").css("display","block");
 	  	     }
 		           
 	  	  },
