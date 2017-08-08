@@ -24,6 +24,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.techstar.planmanage.entity.plan;
 import com.techstar.planmanage.entity.plancheck;
 import com.techstar.planmanage.jpa.PlanDao;
+import com.techstar.sys.config.Global;
 import com.techstar.sys.dingAPI.OApiException;
 import com.techstar.sys.dingAPI.auth.AuthHelper;
 import com.techstar.sys.dingAPI.department.Department;
@@ -45,6 +46,12 @@ public class PlanService {
 	}
 	public void delete(plan repair) {
 		planDao.delete(repair);
+	}
+	public List<plan> findByIdOrPlanid(String id,String planid){
+		return planDao.findByIdOrPlanid(Long.parseLong(id), planid);
+	}
+	public List<plan> findByIdOrPid(String id,String pid){
+		return planDao.findByIdOrPid(Long.parseLong(id), pid);
 	}
 	
 	public plan findById(Long id) {
@@ -128,8 +135,8 @@ public class PlanService {
 			String[] depStrings=dep.split(":");
 			for (Department onedep : dlist) {
 				//TODO 判断主管
-				//if((onedep.id).equals(depStrings[0])&&depStrings[1].equals("true")){
-				if((onedep.id).equals(depStrings[0])){	
+				if((onedep.id).equals(depStrings[0])&&(depStrings[1].equals("true")||Global.getConfig("positionNames").indexOf(jsonauthuser.getString("position"))!=-1)){
+				//if((onedep.id).equals(depStrings[0])){	
 					mydList.add(onedep);
 				}
 			}
@@ -141,16 +148,23 @@ public class PlanService {
 	public List<plan> getplanjindu(String deptid,String year){
 		List<plan> listallPlans=planDao.findByDeptidAndYearAndPid(deptid, year, "0");
 		for (plan parentplan : listallPlans) {
-			List<plan> lv1taskList=planDao.findByPidAndIsdel(parentplan.getId().toString(),"0");
+			
+			List<plan> lv1taskList=planDao.findByPid(parentplan.getId().toString());
 			int lv1size=lv1taskList.size();
 			Double planjindu=0.00;
 			for (plan lv1task : lv1taskList) {
+				if(lv1task.getIsdel().equals("1")&&lv1task.getDelxz()!=null&&lv1task.getDelxz().equals("0")){
+					continue;
+				}
 				//获得lv1任务进度
-				List<plan> lv2taskList=planDao.findByPidAndIsdel(lv1task.getId().toString(),"0");
+				List<plan> lv2taskList=planDao.findByPid(lv1task.getId().toString());
 				int lv2size=lv2taskList.size();
 				Double lv1jindu=0.00;
 				if(lv2size>0){
 					for (plan lv2task : lv2taskList) {
+						if(lv2task.getIsdel().equals("1")&&lv1task.getDelxz()!=null&&lv2task.getDelxz().equals("0")){
+							continue;
+						}
 						lv1jindu+=Double.parseDouble(lv2task.getJindu()==null?"0":lv2task.getJindu())*(1.00/lv2size);
 					}
 				}else{

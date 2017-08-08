@@ -26,6 +26,7 @@ import com.techstar.planmanage.entity.planchange;
 import com.techstar.planmanage.entity.plancheck;
 import com.techstar.planmanage.jpa.PlanDao;
 import com.techstar.planmanage.jpa.PlanchangeDao;
+import com.techstar.sys.config.Global;
 import com.techstar.sys.dingAPI.OApiException;
 import com.techstar.sys.dingAPI.auth.AuthHelper;
 import com.techstar.sys.dingAPI.department.Department;
@@ -133,8 +134,8 @@ public class PlanchangeService {
 			String[] depStrings=dep.split(":");
 			for (Department onedep : dlist) {
 				//TODO 判断主管
-				//if((onedep.id).equals(depStrings[0])&&depStrings[1].equals("true")){
-				if((onedep.id).equals(depStrings[0])){	
+				if((onedep.id).equals(depStrings[0])&&(depStrings[1].equals("true")||Global.getConfig("positionNames").indexOf(jsonauthuser.getString("position"))!=-1)){
+				//if((onedep.id).equals(depStrings[0])){	
 					mydList.add(onedep);
 				}
 			}

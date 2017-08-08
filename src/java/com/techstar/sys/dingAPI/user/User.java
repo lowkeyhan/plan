@@ -19,6 +19,7 @@ public class User {
 	public String jobnumber;
 	public JSONObject extattr;
 	public String isLeaderInDepts;
+	public String isAdmin;
 	public User() {
 	}
 	
@@ -30,16 +31,20 @@ public class User {
 	@Override
 	public String toString() {
 		List<User> users;
-		return "User[userid:" + userid + ", name:" + name + ", active:" + active + ", "
+		String userString= "User[userid:" + userid + ", name:" + name + ", active:" + active + ", "
 				+ "avatar:" + avatar + ", department:" + department +
 				", position:" + position + ", mobile:" + mobile + ", email:" + email + 
-				", extattr:" + extattr+ ", isLeaderInDepts:" + isLeaderInDepts;
+				", extattr:" + extattr+ ", isLeaderInDepts:" + isLeaderInDepts+ ", isAdmin:" + isAdmin+"]";
+		System.out.println(userString);
+		return userString;
 	}
 	
 	public String toJSONString() {
-		return "{\"userid\":\"" + userid + "\",\"name\":\"" + name + "\",\"active\":\"" + active + "\","
+		String userString="{\"userid\":\"" + userid + "\",\"name\":\"" + name + "\",\"active\":\"" + active + "\","
 				+ "\"avatar\":\"" + avatar + "\",\"department\":\"" + department +
 				"\",\"position\":\"" + position + "\",\"mobile\":\"" + mobile + "\",\"email\":\"" + email + 
-				"\",\"extattr\":\"" + extattr+"\",\"isLeaderInDepts\":\""+isLeaderInDepts+"\"}";
-	}
+				"\",\"extattr\":" + extattr+",\"isLeaderInDepts\":\""+isLeaderInDepts+"\",\"isAdmin\":\""+isAdmin+"\"}";
+		System.out.println(userString);
+		return userString;
+		}
 }

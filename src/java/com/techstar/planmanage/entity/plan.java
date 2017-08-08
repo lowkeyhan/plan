@@ -49,6 +49,9 @@ public class plan  {
 	private String jindu;
 	private String isdel;//是否删除
 	private String delsm;//删除
+	private String delxz;//删除性质
+	private Integer zcbg=0;//正常变更
+	private Integer fzcbg=0;//非正常变更
 	
 	public String getFuzherenname() {
 		return fuzherenname;
@@ -184,6 +187,25 @@ public class plan  {
 	public void setDelsm(String delsm) {
 		this.delsm = delsm;
 	}
+	public Integer getZcbg() {
+		return zcbg;
+	}
+	public void setZcbg(Integer zcbg) {
+		this.zcbg = zcbg;
+	}
+	public Integer getFzcbg() {
+		return fzcbg;
+	}
+	public void setFzcbg(Integer fzcbg) {
+		this.fzcbg = fzcbg;
+	}
+	public String getDelxz() {
+		return delxz;
+	}
+	public void setDelxz(String delxz) {
+		this.delxz = delxz;
+	}
+	
 	
 	
  

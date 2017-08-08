@@ -48,6 +48,8 @@
 						<input type="hidden" id="id" name="id" value="${plan.id}"/>
 						<input type="hidden" id="taskid" name="taskid" value="${plan.id}"/>
 						<input type="hidden" id="jindu" name="jindu" value="${plan.jindu}"/>
+						<input type="hidden" id="zcbg" name="zcbg" value="${plan.zcbg}"/>
+						<input type="hidden" id="fzcbg" name="fzcbg" value="${plan.fzcbg}"/>
                         <div class="weui_cells weui_cells_form">
                             <div class="weui_cell">
                                 <div class="weui_cell_hd"><label class="weui_label">任务内容</label></div>

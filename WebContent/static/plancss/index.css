@@ -29,7 +29,7 @@
 			font-size: 16px !important;
 		}
 		.main_title{
-			width: 100%;border-bottom: 1px solid #e6e6e6;height: 75px;
+			width: 100%;border-bottom: 1px solid #e6e6e6;height: 85px;
 			background-color:#30A8A5;
 			 word-break:keep-all;/* 不换行 */ white-space:nowrap;/* 不换行 */ overflow:-webkit-paged-x;
 		}

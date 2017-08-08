@@ -33,6 +33,7 @@ import java.util.List;
 public class OAMessage extends Message {
 	
 	public String message_url;
+	public String pc_message_url;
 	public Head head;
 	public Body body;
 	
@@ -45,6 +46,7 @@ public class OAMessage extends Message {
 	//content
 	public static class Head {
 		public String bgcolor;
+		public String text;
 	}
 	
 	public static class Body {

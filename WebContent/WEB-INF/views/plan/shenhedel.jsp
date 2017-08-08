@@ -103,7 +103,20 @@
 		 </div>
  </div>
 </form>
-
+  <div class="weui_cells weui_cells_form" id="changediv" style="display:none;    margin-bottom: 50px;" >
+    <div class="weui_cell weui_cell_select weui_select_after">
+        <div class="weui_cell_hd">
+            <label for="" class="weui_label">撤销性质</label>
+        </div>
+        <div class="weui_cell_bd weui_cell_primary">
+            <select class="weui_select" id="changexz">
+             <option value="2">请选择</option>
+                <option value="1">正常撤销</option>
+                <option value="0">非正常撤销</option>
+            </select>
+        </div>
+    </div>
+</div>
 <div class="approve-foot show">
 <div class="tFlexbox tAlignCenter tJustifyCenter" id="btnlist">
 <div class="tFlex1 approval-action tTap agree"  onclick="submitplan('${plancheck.state}')" >同意</div>
@@ -118,7 +131,10 @@ var authconfig=$.parseJSON('${authconfig}');
 <script src='${ctx}/static/planjs/dingpublic.js'></script>
 <script type="text/javascript">
 dd.ready(function(){
-	
+	if("${plancheck.state}"=="3"){
+		$('#changediv').show();
+		$("#changexz").val("2");
+	}
 	
 });
 dd.error(function(err) {
@@ -132,6 +148,10 @@ function submitplan(state){
 	if(state=="2"){
 		state="3";
 	}else if(state=="3"){
+		if($("#changexz").val()=="2"){
+			successalert("请选择变更性质"); 
+			return ;
+		}
 		state="4";
 	}else if(state=="5"){
 		state="5";
@@ -142,7 +162,8 @@ function submitplan(state){
   	  data: {
   		  state:state,
   		  tid:'${plan.id}',
-  		  id:'${plancheck.id}'
+  		  id:'${plancheck.id}',
+  		  changexz:$("#changexz").val()
   	  },
   	  dataType: 'json',
   	  success: function(data){

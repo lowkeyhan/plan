@@ -44,6 +44,7 @@ import com.techstar.sys.dingAPI.OApiException;
 import com.techstar.sys.dingAPI.auth.AuthHelper;
 import com.techstar.sys.dingAPI.department.Department;
 import com.techstar.sys.dingAPI.department.DepartmentHelper;
+import com.techstar.sys.dingAPI.message.MessageHelper;
 import com.techstar.sys.dingAPI.user.User;
 import com.techstar.sys.dingAPI.user.UserHelper;
 import com.techstar.sys.jpadomain.Results;
@@ -169,6 +170,17 @@ public class plancheckContorller {
 			subPlancheck.setState("2");
 		}
 		plancheckService.save(subPlancheck);
+		
+		//发送通知消息
+		List<power> listpowerList=powerService.findByTypeAndDeptidLike("主管副总审批", "%"+deptid+"%");
+		String tousers="";
+		for (power power : listpowerList) {
+			tousers+=power.getAdminid()+"|";
+		}
+		if(tousers.length()>0){
+			tousers=tousers.substring(0, tousers.length()-1);
+			MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理",deptname+"提交了计划需要主管审批", subPlancheck.getOperationer(), "", tousers, request);
+		}
 		return  new Results(year+"年计划提交成功");
 	}
 	
@@ -198,7 +210,7 @@ public class plancheckContorller {
 		//获取带审核列表 ，state (1：未提交，2：已提交主管未审核，3：主管审核总监未审核，4：审核通过)
 		List<plancheck> planchecks=new ArrayList<plancheck>();
 		//获得用户主管角色权限
-		List<power> listpowerList=powerService.findByAdminidAndType(userJsonObject.get("userid").toString(), "主管副总");
+		List<power> listpowerList=powerService.findByAdminidAndType(userJsonObject.get("userid").toString(), "主管副总审批");
 		if(listpowerList.size()>0){
 			//根据主管部门获得部门计划审核列表
 			List<String> idList=new ArrayList<String>();
@@ -208,7 +220,7 @@ public class plancheckContorller {
 		}
 		if(planchecks.size()<=0){
 			//获得用户总监权限
-			List<power> zlistpowerList=powerService.findByAdminidAndType(userJsonObject.get("userid").toString(), "战略总监");
+			List<power> zlistpowerList=powerService.findByAdminidAndType(userJsonObject.get("userid").toString(), "总经理助理审批");
 			if(zlistpowerList.size()>0){
 				//总监处理所有部门计划总监审核
 				planchecks=plancheckService.findByState( "3");
@@ -239,8 +251,10 @@ public class plancheckContorller {
 		//获得原来的状态信息判断审核人身份
 		String oldstateString=plancheckstate.getState();
 		String checktype="zhuguan";
+		String titlenameString="主管";
 		if(oldstateString.equals("3")){
 			checktype="zongjian";
+			titlenameString="战规总监";
 		}
 		//赋予新的状态
 		plancheckstate.setState(state);
@@ -265,6 +279,30 @@ public class plancheckContorller {
 		checklog.setShuoming("审核通过");
 		if(state.equals("1")){
 			checklog.setShuoming("审核不通过");
+			/*发送通知消息
+			List<power> listpowerList=powerService.findByTypeAndDeptidLike("主管副总审批", "%"+deptid+"%");
+			String tousers="";
+			for (power power : listpowerList) {
+				tousers+=power.getAdminid()+"|";
+			}*/
+			MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理",titlenameString+"审批不通过", checklog.getOperationer(), "审批意见："+shuju, plancheckstate.getOperationerid(), request);
+			
+		}else{
+			if(checktype.equals("zhuguan"))
+			{
+				List<power> listpowerList=powerService.findByType("总经理助理审批");
+				String tousers="";
+				for (power power : listpowerList) {
+					tousers+=power.getAdminid()+"|";
+				}
+				tousers+=plancheckstate.getOperationerid();
+				MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理",titlenameString+"审批通过需战规总监审批", checklog.getOperationer(), "主管审批意见："+shuju, tousers, request);
+					
+			}else if(checktype.equals("zongjian")){
+				MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理",titlenameString+"审批通过", checklog.getOperationer(), "审批意见："+shuju, plancheckstate.getOperationerid(), request);
+				
+			}
+			
 		}
 		checklog.setShuju(shuju);
 		checklog.setType(checktype);

@@ -45,13 +45,13 @@
                         <div class="weui_cells weui_cells_form">
                             <div class="weui_cell weui_cell_select weui_select_after">
                                 <div class="weui_cell_hd">
-                                    <label for="" class="weui_label">计划类别</label>
+                                    <label for="" class="weui_label">权限类别</label>
                                 </div>
                                 <div class="weui_cell_bd weui_cell_primary">
                                     <select class="weui_select" name="type" id="type" onchange="typeChange()" >
-                                        <option value="主管副总">主管副总</option>
-                                        <option value="战略总监">战略总监</option>
-                                        <option value="计划查看">计划查看</option>
+                                        <option value="主管副总审批">主管副总审批审批</option>
+                                        <option value="总经理助理审批">总经理助理审批</option>
+                                        <option value="所有计划查看">所有所有计划查看</option>
                                     </select>
                                 </div>
                             </div>
@@ -94,7 +94,7 @@ var authconfig=$.parseJSON('${authconfig}');
 <script type="text/javascript">
 dd.ready(function(){
 	if("${power.type}"==""){
-		$("#type").val("主管副总");
+		$("#type").val("主管副总审批");
 	}else{
 		$("#type").val("${power.type}");
 	}
@@ -126,7 +126,7 @@ function submitform(){
 }
 function typeChange(){
 	var selectval=$("#type").val();
-	if(selectval=="主管副总"){
+	if(selectval=="主管副总审批"){
 		$("#zhuguanbumen").show();
 	}else{
 		$("#zhuguanbumen").hide();

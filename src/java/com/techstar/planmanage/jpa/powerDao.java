@@ -32,8 +32,11 @@ public interface powerDao<T, ID extends Serializable> extends JpaRepository<powe
 	
 	power findById(Long id);
 	public List<power> findByAdminidAndType(String Adminid,String type) ;
-	public List<power> findByType(String type) ;
-   //List<Events> ceventslist=eventsService.findBy("StarttimeGreaterThanAndStarttimeLessThanAndParticipantidLike", sDate, eDate,userid);
+	public List<power> findByTypeOrderByOperationdateDesc(String type) ;
+	public List<power> findByTypeAndDeptidLike(String type,String deptid) ;//主管副总审批
+	public List<power> findByAdminidLikeAndType(String adminid ,String type) ;
+
+   //主管副总审批List<Events> ceventslist=eventsService.findBy("StarttimeGreaterThanAndStarttimeLessThanAndParticipantidLike", sDate, eDate,userid);
 }
 		
 

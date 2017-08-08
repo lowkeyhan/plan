@@ -10,6 +10,7 @@ import javax.persistence.Id;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 import com.techstar.planmanage.entity.plan;
 
@@ -34,8 +35,12 @@ public interface PlanDao<T, ID extends Serializable> extends JpaRepository<plan,
 	List<plan> findByDeptidAndYearAndPid(String deptid, String year,String pid);
 	List<plan> findByPid(String pid);
 	List<plan> findByPidAndIsdel(String pid,String isdel);
+	List<plan> findByPidAndIsdelAndDelxz(String pid,String isdel,String delxz);
 	List<plan> findByFuzherenidLikeAndDeptidInAndJinduNotOrderByStimeAsc(String fuzherenid,List<String> deptid,String jindu);
-   //findBy("StarttimeGreaterThanAndStarttimeLessThanAndOperationerid",sDate ,eDate,userid);
+   
+	List<plan> findByIdOrPlanid(Long id,String planid);
+	List<plan> findByIdOrPid(Long id,String pid);
+	//findBy("StarttimeGreaterThanAndStarttimeLessThanAndOperationerid",sDate ,eDate,userid);
 	//List<Events> ceventslist=eventsService.findBy("StarttimeGreaterThanAndStarttimeLessThanAndParticipantidLike", sDate, eDate,userid);
 }
 		

@@ -123,7 +123,12 @@ function getplanlist(){
   	    	 listdept+="<li class=\"weui_media_info_meta\">"+n.level+"</li>";
   	    	 listdept+="<li class=\"weui_media_info_meta weui_media_info_meta_extra\">权重："+n.weight+"%</li>";
   	    	 listdept+="</ul>";
-  	    	 
+  	    	listdept+="<div style=\"width: 20px;height: 20px; background-color: #FFFFFF;position: absolute; right: 15px;top: 5px; font-size: 12px;line-height: 20px;vertical-align: middle;text-align: center;border-radius: 50%;border: 1px solid #0BB20C;\">";
+  	    	listdept+=n.zcbg;
+			listdept+="</div>";
+			listdept+="<div style=\"width: 20px;height: 20px; background-color: #FFFFFF;position: absolute; right: 15px;top: 28px; font-size: 12px;line-height: 20px;vertical-align: middle;text-align: center;border-radius: 50%;border: 1px solid #C90014;\">";
+			listdept+=n.fzcbg;
+			listdept+="</div>";
   	    	listdept+="<div class=\"weui_progress\">";
   	    	listdept+="    <div class=\"weui_progress_bar\">";
   	    	listdept+="       <div class=\"weui_progress_inner_bar js_progress\" style=\"width: "+n.jindu+"%;\"></div>";

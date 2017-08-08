@@ -99,7 +99,7 @@
 	           <div class="weui_cell_hd"><label class="weui_label">进度</label></div>
 	           <div class="weui_cell_bd weui_cell_primary">
 	               <input class="weui_input" id="newjindu"  name="newjindu" 
-	                      type="text" value='${plan.jindu}'>
+	                      type="number" value='${plan.jindu}'>
 	    		</div>
 	    		<div class="weui_cell_ft">
 	                %

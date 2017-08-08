@@ -1,5 +1,7 @@
 package com.techstar.planmanage.web;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -85,7 +88,24 @@ public class powerContorller {
 		return "plan/poweradd";
 	}
 	
-
+	@RequestMapping("/pcadmin")
+	public String pcadmin(Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		
+		String configstr= AuthHelper.getConfig(request);
+		model.addAttribute("authconfig", configstr);
+		return "pcplan/adminindex";
+	}
+	@RequestMapping("/pcpoweradd")
+	public String pcpoweradd(@RequestParam(value = "oper", required = false) String oper,
+			@RequestParam(value = "id", required = false) String id,Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		if(StringUtil.isNotBlank(oper)&&oper.equals("edit")){
+			model.addAttribute("power", powerService.findById(Long.parseLong(id)));
+		}
+		String configstr= AuthHelper.getConfig(request);
+		model.addAttribute("authconfig", configstr);
+		return "pcplan/poweradd";
+	}
+	
 	@RequestMapping("/addpower")
 	public @ResponseBody Results  addjindu(@ModelAttribute power powerform,
 			@RequestParam(value = "oper", required = false) String oper,
@@ -105,6 +125,7 @@ public class powerContorller {
 		powerService.save(powerform);
 		return  new Results("保存成功",powerform.getId());
 	}
+	
 	@RequestMapping("/getpower")
 	public @ResponseBody Results  getpower(
 			Model model,HttpServletRequest request,
@@ -113,4 +134,39 @@ public class powerContorller {
 		List<power> powerlist=powerService.findAll();
 		return  new Results(powerlist);
 	}
+	
+	@RequestMapping("/getmessuser")
+	public @ResponseBody Results  getmessuser(
+			Model model,HttpServletRequest request,
+			HttpServletResponse response) throws OApiException, UnsupportedEncodingException {
+		String usersString="";
+		List<power> powerlist=powerService.findByType("提醒人员");
+		if(powerlist.size()>0){
+			usersString=powerlist.get(0).getAdminid();
+		}
+		return  new Results(usersString);
+	}
+	@RequestMapping("/getjindulist")
+	public @ResponseBody Results requestRecordStatistics(HttpServletRequest request, HttpServletResponse response){
+		OutputStream ouputStream=null;	
+		try{
+			HSSFWorkbook workbook = powerService.GetAllRecord();
+			response.setContentType("application/x-download");
+			response.setHeader("Content-disposition", "attachment; filename="
+	                + new String("进度统计".getBytes("utf-8"), "ISO-8859-1") + ".xls"); //设定输出文件头
+	        ouputStream = response.getOutputStream();
+	        workbook.write(ouputStream);
+	        ouputStream.flush();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+	        try {
+				ouputStream.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		return  new Results("下载成功");
+	}
+
 }

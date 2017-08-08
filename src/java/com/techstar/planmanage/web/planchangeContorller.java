@@ -32,16 +32,19 @@ import com.techstar.planmanage.entity.checklog;
 import com.techstar.planmanage.entity.plan;
 import com.techstar.planmanage.entity.planchange;
 import com.techstar.planmanage.entity.plancheck;
+import com.techstar.planmanage.entity.power;
 import com.techstar.planmanage.service.ChecklogService;
 import com.techstar.planmanage.service.PlanService;
 import com.techstar.planmanage.service.PlanchangeService;
 import com.techstar.planmanage.service.PlancheckService;
+import com.techstar.planmanage.service.powerService;
 import com.techstar.sys.Util.StringUtil;
 import com.techstar.sys.config.Global;
 import com.techstar.sys.dingAPI.OApiException;
 import com.techstar.sys.dingAPI.auth.AuthHelper;
 import com.techstar.sys.dingAPI.department.Department;
 import com.techstar.sys.dingAPI.department.DepartmentHelper;
+import com.techstar.sys.dingAPI.message.MessageHelper;
 import com.techstar.sys.dingAPI.user.User;
 import com.techstar.sys.dingAPI.user.UserHelper;
 import com.techstar.sys.jpadomain.Results;
@@ -63,6 +66,8 @@ public class planchangeContorller {
 	private PlancheckService plancheckService;
 	@Autowired
 	private ChecklogService checklogService;
+	@Autowired
+	private powerService powerService;
 	
 	@RequestMapping("/taskchange")
 	public String taskchange(@RequestParam(value="id",required=false)String id,
@@ -108,7 +113,16 @@ public class planchangeContorller {
 		planchangeService.save(planform);
 		newPlancheck.setChangeid(planform.getId().toString());
 		plancheckService.save(newPlancheck);
-		
+		//发送通知消息
+				List<power> listpowerList=powerService.findByTypeAndDeptidLike("主管副总审批", "%"+planform.getDeptid()+"%");
+				String tousers="";
+				for (power power : listpowerList) {
+					tousers+=power.getAdminid()+"|";
+				}
+				if(tousers.length()>0){
+					tousers=tousers.substring(0, tousers.length()-1);
+					MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理","计划："+planform.getTitle()+"提交了变更申请需主管审批", planform.getOperationer(), "", tousers, request);
+				}
 		return new Results(true, "提交成功，等待审核", planform.getId().toString());
 	}	
 	@RequestMapping("/shenhechange")
@@ -145,9 +159,9 @@ public class planchangeContorller {
 	}
 	/**
 	 * 保存审核结果并记录
-	 * @param state 1：未提交，2：已提交主管未审核，3：主管审核总监未审核，4：审核通过,5：审核通过)
+	 * @param state 1：未提交，2：已提交主管未审核，3：主管审核总监未审核，4：审核通过,5：审核不通过)
 	 * @param checkid 审核id
-	 * @param shuju  是否正常变更年 1为正常变更，0为非正常变更，最后总监爱审核才有
+	 * @param shuju  是否正常变更年 1为正常变更，0为非正常变更，最后总监审核才有
 	 * @param model
 	 * @param request
 	 * @param response
@@ -183,6 +197,7 @@ public class planchangeContorller {
 				//planform.setOperationerid(userJsonObject.get("userid").toString());
 			}
 		}
+		plan plan=planService.findById(Long.parseLong(tid));
 		//保存审核记录，记录审核人审核信息
 		checklog checklog=new checklog();
 		checklog.setCheckid(plancheckstate.getId().toString());
@@ -193,7 +208,10 @@ public class planchangeContorller {
 		checklog.setShuoming("变更审核通过");
 		if(state.equals("5")){
 			checklog.setShuoming("变更审核不通过");
+			MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理","计划："+plan.getTitle()+"变更审批不通过", checklog.getOperationer(), "", plancheckstate.getOperationerid(), request);
+			
 		}
+		//changexz 1：正常变更，0：非正常变更
 		checklog.setShuju(changexz);
 		checklog.setType(checktype);
 		checklog.setYear(plancheckstate.getYear());
@@ -203,7 +221,7 @@ public class planchangeContorller {
 		//总监审核成功则用changepaln中的数据覆盖plan中的数据做最后变更，并在changeplan中标记状态和是否正常变更
 		if(checktype.equals("zongjian")&&state.equals("4")){
 			planchange planchange=planchangeService.findById(Long.parseLong(cid));
-			plan plan=planService.findById(Long.parseLong(tid));
+			
 			//标记状态和变更性质
 			planchange.setState(state);
 			planchange.setIsnormal(changexz);
@@ -222,8 +240,24 @@ public class planchangeContorller {
 			plan.setWeight(planchange.getWeight());
 			plan.setSsessmentindex(planchange.getSsessmentindex());
 			
+			//记录变更次数
+			if(changexz.equals("1")){
+				plan.setZcbg(plan.getZcbg()+1);
+			}else if(changexz.equals("0")){
+				plan.setFzcbg(plan.getFzcbg()+1);
+			}
 			planService.save(plan);
 			planchangeService.save(planchange);
+			MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理","计划："+plan.getTitle()+"变更审批通过", checklog.getOperationer(), "变更性质："+changexz, plancheckstate.getOperationerid(), request);
+		}else if(checktype.equals("zhuguan")&&state.equals("3")){
+			List<power> listpowerList=powerService.findByType("总经理助理审批");
+			String tousers="";
+			for (power power : listpowerList) {
+				tousers+=power.getAdminid()+"|";
+			}
+			tousers+=plancheckstate.getOperationerid();
+			MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理","计划："+plan.getTitle()+"变更申请主管通过需战规总监审批", checklog.getOperationer(), "", tousers, request);
+			
 		}
 		return  new Results(true,"审核完成");
 	}
@@ -274,6 +308,16 @@ public class planchangeContorller {
 		plancheckService.save(newPlancheck);
 		delplan.setDelsm(delsm);
 		planService.save(delplan);
+		//发送通知消息
+		List<power> listpowerList=powerService.findByTypeAndDeptidLike("主管副总审批", "%"+delplan.getDeptid()+"%");
+		String tousers="";
+		for (power power : listpowerList) {
+			tousers+=power.getAdminid()+"|";
+		}
+		if(tousers.length()>0){
+			tousers=tousers.substring(0, tousers.length()-1);
+			MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理","计划："+delplan.getTitle()+"提交了变更申请需主管审批", newPlancheck.getOperationer(), "", tousers, request);
+		}
 		return new Results(true, "提交成功，等待审核", delplan);
 	}	
 	@RequestMapping("/shenhedel")
@@ -307,9 +351,11 @@ public class planchangeContorller {
 	public @ResponseBody Results  shdel(@RequestParam(value="state",required=false)String state,
 			@RequestParam(value="id",required=false)String checkid,
 			@RequestParam(value="tid",required=false)String tid,
+			@RequestParam(value="changexz",required=false)String changexz,
 			Model model,HttpServletRequest request,
 			HttpServletResponse response) throws OApiException, UnsupportedEncodingException {
 		plancheck plancheckstate=plancheckService.findById(Long.parseLong(checkid));
+		plan plan=planService.findById(Long.parseLong(tid));
 		//获得原来的状态信息判断审核人身份
 		String oldstateString=plancheckstate.getState();
 		String powernameString="主管";
@@ -341,6 +387,8 @@ public class planchangeContorller {
 		checklog.setShuoming("撤销审核"+powernameString+"通过");
 		if(state.equals("5")){
 			checklog.setShuoming("撤销审核"+powernameString+"不通过");
+			MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理","计划："+plan.getTitle()+"撤销审批不通过", checklog.getOperationer(), "", plancheckstate.getOperationerid(), request);
+			
 		}
 		checklog.setType(checktype);
 		checklog.setYear(plancheckstate.getYear());
@@ -348,10 +396,22 @@ public class planchangeContorller {
 		checklogService.save(checklog);
 		
 		//总监审核成功则用changepaln中的数据覆盖plan中的数据做最后变更，并在changeplan中标记状态和是否正常变更
+		
 		if(checktype.equals("zongjian")&&state.equals("4")){
-			plan plan=planService.findById(Long.parseLong(tid));
+			
 			plan.setIsdel("1");
+			plan.setDelxz(changexz);
 			planService.save(plan);
+			MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理","计划："+plan.getTitle()+"撤销审批通过", checklog.getOperationer(), "变更性质："+changexz, plancheckstate.getOperationerid(), request);
+		}else if(checktype.equals("zhuguan")&&state.equals("3")){
+			List<power> listpowerList=powerService.findByType("总经理助理审批");
+			String tousers="";
+			for (power power : listpowerList) {
+				tousers+=power.getAdminid()+"|";
+			}
+			tousers+=plancheckstate.getOperationerid();
+			MessageHelper.sendmessage("/pcplan/index", "/plan/index", "计划管理","计划："+plan.getTitle()+"撤销申请主管通过需战规总监审批", checklog.getOperationer(), "", tousers, request);
+			
 		}
 		return  new Results(true,"审核完成");
 	}

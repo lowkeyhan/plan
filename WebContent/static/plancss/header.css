@@ -1,0 +1,43 @@
+.nav-bar{
+	float: left;line-height: 40px;padding-left: 10px;cursor: pointer;font-size: 16px;
+	   
+}
+.nav-bar-right{
+	float: right;
+	line-height: 40px;
+	padding-right: 10px;
+	 margin-right: 10px;
+	cursor: pointer;font-size: 16px;
+	   
+}
+header{
+	height: 40px;width: 100%px;  border-bottom: 1px solid #E7E8EA; background-color: #FFF;text-align: center;
+}
+label{
+	font-weight:normal;
+}
+.weui_labelpc {
+    display: block;
+    width: 4em;
+    font-size: 14px !important;
+
+}
+.form-control {
+    margin-left: 10px;
+    display: block;
+    width: 300px;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 13px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}

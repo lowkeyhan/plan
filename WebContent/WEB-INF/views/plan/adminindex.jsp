@@ -70,7 +70,7 @@ dd.ready(function(){
 				  	    	listtask+="<p class=\"weui_media_desc\">"+n.adminname+n.type+"</p>";
 				  	    	listtask+="<ul class=\"weui_media_info\">";
 				  	    	if(n.deptname!=null&&n.deptname!=""){
-				  	    		listtask+="<li class=\"weui_media_info_meta\">"+n.deptname+"%</li>";
+				  	    		listtask+="<li class=\"weui_media_info_meta\">"+n.deptname+"</li>";
 				  	    	}
 				  	    	
 				  	    	

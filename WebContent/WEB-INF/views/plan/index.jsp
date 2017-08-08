@@ -38,15 +38,14 @@
 		<span class="icon icon-message item_icon  iconfont icon-crmtubiao67" ></span>
 		<div class="item_font">审批管理</div>
 	</a>
-	<a onclick="changedept()" class="title_item">
+	<a onclick="changedept()" id="lookitem" class="title_item">
 		<span class="icon icon-message item_icon  iconfont icon-houtaigunli" ></span>
 		<div class="item_font">查看计划</div>
 	</a>
-	<a href="${ctx}/power/admin" class="title_item">
+	<a href="${ctx}/power/admin" id="poweritem" class="title_item">
 		<span class="icon icon-message item_icon  iconfont icon-houtaigunli" ></span>
 		<div class="item_font">后台管理</div>
 	</a>
-	
 </div>
 <div class="weui_panel">
     <div class="weui_panel_hd">我的任务</div>
@@ -57,6 +56,7 @@
 </div>
 </body>
 <script type="text/javascript" charset="utf-8" >
+
 var authconfig=$.parseJSON('${authconfig}');
 dd.config({
 		agentId : authconfig.agentid,
@@ -97,7 +97,18 @@ dd.ready(function(){
 				  	    	 
 		    	     });
 		            document.getElementById("deptlistdiv").innerHTML=listtask;
-	    	      
+		            var powerlist=data.message.split(",");
+		            if(powerlist[0]=="1"){
+		            	$("#lookitem").show();
+		            }else{
+		            	$("#lookitem").hide();
+		            }
+		            if(powerlist[1]=="1"){
+		            	$("#poweritem").show();
+		            }else{
+
+		            	$("#poweritem").hide();
+		            }
 	    	  },
 	    	  error: function(xhr, type,error){
 	    	    alert('Ajax error!');

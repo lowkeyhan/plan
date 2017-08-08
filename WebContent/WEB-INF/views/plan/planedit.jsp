@@ -46,6 +46,15 @@
 		.delfont{
 			text-decoration:line-through;
 		}
+				.weui_progress_opr {
+    display: block;
+    margin-left: 15px;
+    font-size: 12px;
+}
+.weui_media_box {
+    padding: 10px 15px;
+    position: relative;
+}
     </style>
 </head>
 <body>
@@ -62,6 +71,8 @@
 						<input type="hidden" id="year" name="year" value="${plan.year}"/>
 						<input type="hidden" id="id" name="id" value="${plan.id}"/>
 						<input type="hidden" id="pid" name="pid" value="${plan.pid}"/>
+						<input type="hidden" id="zcbg" name="zcbg" value="${plan.zcbg}"/>
+						<input type="hidden" id="fzcbg" name="fzcbg" value="${plan.fzcbg}"/>
                         <div class="weui_cells weui_cells_form">
                             <div class="weui_cell">
                                 <div class="weui_cell_hd"><label class="weui_label">计划名称</label></div>
@@ -360,6 +371,25 @@ function getoneleveltask(pid){
 	  	    	}
 	  	    
 	  	    	listtask+="</ul>";
+	  	    	if(n.fuzherenname!=null&&n.fuzherenname!=""){
+		  	    	listtask+="<div style=\"width: 20px;height: 20px; background-color: #FFFFFF;position: absolute; right: 15px;top: 5px; font-size: 12px;line-height: 20px;vertical-align: middle;text-align: center;border-radius: 50%;border: 1px solid #0BB20C;\">";
+		  	    	listtask+=n.zcbg;
+		  	    	listtask+="</div>";
+		  	    	listtask+="<div style=\"width: 20px;height: 20px; background-color: #FFFFFF;position: absolute; right: 15px;top: 28px; font-size: 12px;line-height: 20px;vertical-align: middle;text-align: center;border-radius: 50%;border: 1px solid #C90014;\">";
+		  	    	listtask+=n.fzcbg;
+		  	    	listtask+="</div>";
+		  	    	listtask+="<div class=\"weui_progress\">";
+		  	    	listtask+="    <div class=\"weui_progress_bar\">";
+		  	    	listtask+="       <div class=\"weui_progress_inner_bar js_progress\" style=\"width: "+n.jindu+"%;\"></div>";
+		  	    	listtask+="   </div>";
+		  	    	listtask+="   <div  class=\"weui_progress_opr\">";
+		  	    	listtask+=n.jindu+"%";
+		  	    	listtask+="    </div>";
+		  	    	listtask+="</div>";
+	  	    	}
+	  	    	
+	  	    	
+	  	    	
 	  	    	listtask+="</a>";
 	  	    	listtask+=" <div class=\"planchind\"  id=\""+n.id+"\" ></div>";
 	  	    	 
@@ -412,6 +442,22 @@ function gettwoleveltask(pid){
 	  	    	}
 	  	    
 	  	    	listtask+="</ul>";
+	  	    	if(n.fuzherenname!=null&&n.fuzherenname!=""){
+		  	    	listtask+="<div style=\"width: 20px;height: 20px; background-color: #FFFFFF;position: absolute; right: 15px;top: 5px; font-size: 12px;line-height: 20px;vertical-align: middle;text-align: center;border-radius: 50%;border: 1px solid #0BB20C;\">";
+		  	    	listtask+=n.zcbg;
+		  	    	listtask+="</div>";
+		  	    	listtask+="<div style=\"width: 20px;height: 20px; background-color: #FFFFFF;position: absolute; right: 15px;top: 28px; font-size: 12px;line-height: 20px;vertical-align: middle;text-align: center;border-radius: 50%;border: 1px solid #C90014;\">";
+		  	    	listtask+=n.fzcbg;
+		  	    	listtask+="</div>";
+		  	    	listtask+="<div class=\"weui_progress\">";
+		  	    	listtask+="    <div class=\"weui_progress_bar\">";
+		  	    	listtask+="       <div class=\"weui_progress_inner_bar js_progress\" style=\"width: "+n.jindu+"%;\"></div>";
+		  	    	listtask+="   </div>";
+		  	    	listtask+="   <div  class=\"weui_progress_opr\">";
+		  	    	listtask+=n.jindu+"%";
+		  	    	listtask+="    </div>";
+		  	    	listtask+="</div>";
+	  	    	}
 	  	    	listtask+="</a>";
 	  	    	 
 	  	     	});

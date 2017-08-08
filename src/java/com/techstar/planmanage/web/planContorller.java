@@ -30,8 +30,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.techstar.planmanage.entity.plan;
 import com.techstar.planmanage.entity.planchange;
+import com.techstar.planmanage.entity.plancheck;
+import com.techstar.planmanage.entity.power;
+import com.techstar.planmanage.jpa.PlanDao;
 import com.techstar.planmanage.service.PlanService;
 import com.techstar.planmanage.service.PlanchangeService;
+import com.techstar.planmanage.service.PlancheckService;
+import com.techstar.planmanage.service.powerService;
 import com.techstar.sys.Util.StringUtil;
 import com.techstar.sys.config.Global;
 import com.techstar.sys.dingAPI.OApiException;
@@ -55,7 +60,13 @@ public class planContorller {
 	private PlanService planService;
 	@Autowired
 	private PlanchangeService planchangeService;
-	
+	@Autowired
+	private  PlanDao planDao;
+	@Autowired
+	PlancheckService plancheckService;
+
+	@Autowired
+	private powerService powerService;
 	
 	@RequestMapping("/index")
 	public String test(Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
@@ -300,6 +311,7 @@ public class planContorller {
 		if (StringUtils.equals("add", oper)) {
 			//planform.setId(null);
 			message = "保存成功";
+			
 		}
 		Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
 		for(Cookie cookie : cookies){
@@ -309,6 +321,7 @@ public class planContorller {
 				planform.setOperationerid(userJsonObject.get("userid").toString());
 			}
 		}
+		planform.setIsdel("0");
 		planService.save(planform);
 		return new Results(true, message, planform.getId().toString());
 	}	
@@ -348,10 +361,75 @@ public class planContorller {
 			Model model,HttpServletRequest request,
 			HttpServletResponse response) throws OApiException, UnsupportedEncodingException {
 		
-		return  new Results(planService.loginandtask(request, response, code));
+		
+		String authuser="";
+		Cookie[] cookies = request.getCookies();//这样便可以获取一个cookie数组
+		for(Cookie cookie : cookies){
+			if(cookie.getName().equals("user")){
+				authuser=URLDecoder.decode(cookie.getValue(),"UTF-8");
+			}
+		}
+		if(authuser.equals("")){
+			JSONObject jsonuser=UserHelper.getUserInfo(AuthHelper.getAccessToken(), code);
+					//System.out.println(code);
+			User dingdingUser=UserHelper.getUser(AuthHelper.getAccessToken(), jsonuser.getString("userid"));
+			authuser=dingdingUser.toJSONString();
+			Cookie cookie =new Cookie("user",URLEncoder.encode(authuser,"UTF-8") );
+			cookie.setMaxAge(3600*24);
+			cookie.setPath("/");
+			response.addCookie(cookie);
+		}
+		JSONObject jsonauthuser=JSON.parseObject(authuser);	
+		//获得年份
+		Calendar nowCalendar=Calendar.getInstance();
+		String yearString=nowCalendar.get(Calendar.YEAR)+"";
+		//获得用户部门
+		String listdep=jsonauthuser.getString("isLeaderInDepts");
+		List<String> deptList=new ArrayList<String>();
+		//查询部门计划是否审核
+		if(!listdep.equals("null")){
+			String[] arrydep=(listdep.replace("{", "").replace("}", "")).split(",");
+			for (String dep : arrydep) {
+				String[] depStrings=dep.split(":");
+				deptList.add(depStrings[0]);
+			}
+		}
+		List<plancheck> sPlanchecks=plancheckService.findByDeptidInAndYearAndState(deptList, yearString, "4");
+		//获得已审核部门
+		List<String> sdept=new ArrayList<String>();
+		sdept.add("0");
+		for (plancheck p:sPlanchecks) {
+			sdept.add(p.getDeptid());
+		}
+				
+		
+		
+		List<plan>  getlistList=planDao.findByFuzherenidLikeAndDeptidInAndJinduNotOrderByStimeAsc("%"+jsonauthuser.get("userid").toString()+"%",sdept, "100");
+		
+		///////////////
+		//List<plan> getlistList=planService.loginandtask(request, response, code);
+		JSONObject userJsonObject=jsonauthuser;
+		String powerlistString="";
+		List<power> listlookp=powerService.findByAdminidLikeAndType("%"+userJsonObject.get("userid").toString()+"%", "所有计划查看");
+		if(listlookp.size()>0){
+			powerlistString+="1";
+		}else {
+			powerlistString+="0";
+		}
+		List<power> listpowerp=powerService.findByAdminidLikeAndType("%"+userJsonObject.get("userid").toString()+"%", "权限管理");
+		if(listpowerp.size()>0){
+			powerlistString+=",1";
+		}else {
+			powerlistString+=",0";
+		}
+		List<power> listp=powerService.findByAdminidLikeAndType("%"+userJsonObject.get("userid").toString()+"%", "提醒权限");
+		if(listp.size()>0){
+			powerlistString+=",1";
+		}else {
+			powerlistString+=",0";
+		}
+		return  new Results(powerlistString,getlistList);
 	}
-	
-	
 	
 	
 	/**统计部门当年进度
@@ -371,5 +449,22 @@ public class planContorller {
 		return new Results(planlist);
 	}
 	
-	
+	@RequestMapping("/delplan")
+	public @ResponseBody Results  delplan(@RequestParam(value="id",required=false)String id,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		List<plan> planlist=planService.findByIdOrPlanid(id, id);
+		for (plan plan : planlist) {
+			planService.delete(plan);
+		}
+		return new Results("chengong");
+	}
+	@RequestMapping("/deltask")
+	public @ResponseBody Results  deltask(@RequestParam(value="id",required=false)String id,
+			Model model,HttpServletRequest request) throws OApiException, UnsupportedEncodingException {
+		List<plan> planlist=planService.findByIdOrPid(id, id);
+		for (plan plan : planlist) {
+			planService.delete(plan);
+		}
+		return new Results("chengong");
+	}
 }

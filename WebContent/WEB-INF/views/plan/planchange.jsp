@@ -48,6 +48,8 @@
 						<input type="hidden" id="id" name="id" value="${plan.id}"/>
 						<input type="hidden" id="taskid" name="taskid" value="${plan.id}"/>
 						<input type="hidden" id="jindu" name="jindu" value="${plan.jindu}"/>
+						<input type="hidden" id="zcbg" name="zcbg" value="${plan.zcbg}"/>
+						<input type="hidden" id="fzcbg" name="fzcbg" value="${plan.fzcbg}"/>
                         <div class="weui_cells weui_cells_form">
                             <div class="weui_cell">
                                 <div class="weui_cell_hd"><label class="weui_label">计划名称</label></div>
@@ -164,7 +166,7 @@ function submitform(){
   	  dataType: 'json',
   	  success: function(data){
   		successalert(data.message);    
-  	  location.href="${ctx}/plan/planedit?id=${plan.planid}&pwoer=true";
+  	  location.href="${ctx}/plan/planedit?id=${plan.id}&pwoer=true";
   	  },
   	  error: function(xhr, type,error){
   	    alert('Ajax error!');

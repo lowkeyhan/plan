@@ -168,7 +168,7 @@ function submitform(){
   	  dataType: 'json',
   	  success: function(data){
   		successalert(data.message);    
-  	  location.href="${ctx}/plan/planedit?id=${plan.planid}&pwoer=true";
+  	  location.href="${ctx}/plan/planedit?id=${plan.id}&pwoer=true";
   	  },
   	  error: function(xhr, type,error){
   	    alert('Ajax error!');

@@ -33,7 +33,6 @@ public interface PlancheckDao<T, ID extends Serializable> extends JpaRepository<
 	List<plancheck> findByDeptidInAndState(List<String> deptidlist,String state);
 	
 	List<plancheck> findByState(String state);
-	
 	List<plancheck> findByDeptidInAndYearAndState(List<String> deptidlist,String year,String state);
    //List<Events> ceventslist=eventsService.findBy("StarttimeGreaterThanAndStarttimeLessThanAndParticipantidLike", sDate, eDate,userid);
 }
